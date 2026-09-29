@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d48651ce4877344c81fe26bfc1f4045, type: 3}
+  m_Name: Quest_LearnSkill
+  m_EditorClassIdentifier: 
+  QuestTitle: "\uC2A4\uD0AC \uBC30\uC6B0\uAE30"
+  QuestDescription: "\uB80C\uC5D0\uAC8C \uAC00\uC11C \uC2A4\uD0AC\uC744 \uBC30\uC6CC\uBCF4\uC790"
+  tasks:
+  - SubTaskCODE: TALK TO REN
+    TargetID: -1
+    TaskExplantion: "\uB80C\uC5D0\uAC8C \uB9D0\uAC78\uAE30"
+    GoalAmount: 1
+    DialogKey: 
+    NPCID: 0
+    Type: 0
+  - SubTaskCODE: USE SKILL POINT
+    TargetID: -1
+    TaskExplantion: "\uB80C\uC5D0\uAC8C \uC124\uBA85 \uB4E4\uC740 \uB300\uB85C \uC2A4\uD0AC\uC744
+      \uBC30\uC6CC\uBCF4\uC790"
+    GoalAmount: 1
+    DialogKey: 
+    NPCID: 0
+    Type: 4
+  QuestReward:
+    Exp: 1000
+    Gold: 1000
+    RewardItemSets: []
+  AcceptionCondition: {fileID: 0}
+  QuestCODE: LEARN SKILL
+  NPC_ID: 500
+  useAutoComplete: 0
+  useAutoAcception: 0

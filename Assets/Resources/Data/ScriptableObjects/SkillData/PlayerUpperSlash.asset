@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: PlayerUpperSlash
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: UpperSlash
+      events:
+      - eventName: 1
+        startTime: 0.37
+        endTime: 0.85
+        poolingEffectName: 
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 0, y: 0, z: 0}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      - eventName: 2
+        startTime: 0
+        endTime: 1
+        poolingEffectName: Sparks_blue
+        effectSetting:
+          localPosition: {x: 0.01, y: 1.01, z: -0.02}
+          localRotation: {x: 0, y: 270, z: 0}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 1
+          isOnWeapon: 1
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      animFullPath: Base Layer.Skills.PlayerUpperSlash@Player
+      hitArea: 2
+  skillIcon: {fileID: 21300000, guid: 4029a9cfeb86f134c9c5af05993eaac8, type: 3}
+  skillName: "\uC5B4\uD37C \uC2AC\uB798\uC2DC"
+  skillDesc: "\uAC80\uC744 \uC704\uB85C \uB4E4\uC5B4 \uC62C\uB9AC\uBA70 \uC801\uC744
+    1\uD68C \uACF5\uACA9\uD55C\uB2E4."
+  skillClass: Active
+  coolTime: 3
+  manaCost: 10
+  range: 10
+  damage: 25
+  damageIncreasePercentPoint: 3
+  castTime: 5
+  skillNO: 2
+  skillLevel: 3
+  openLevel: 0
+  skillType: 2
+  handle: 7002
+  alias: RushAttack

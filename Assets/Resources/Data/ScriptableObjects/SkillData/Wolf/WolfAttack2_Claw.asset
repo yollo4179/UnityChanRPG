@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: WolfAttack2_Claw
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: Attack2Claw
+      events:
+      - eventName: 2
+        startTime: 0.55
+        endTime: 0.8
+        poolingEffectName: Wolf_StoneSlash
+        effectSetting:
+          localPosition: {x: 0, y: 1.91, z: 3}
+          localRotation: {x: 12, y: 284, z: 9.4}
+          localScale: {x: 2.5, y: 2.5, z: 2.5}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 1
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket:
+        - AttackPointFront
+        colCenter: {x: 0, y: 0, z: 0}
+        colSize: {x: 0, y: 0, z: 0}
+      - eventName: 1
+        startTime: 0.55
+        endTime: 0.8
+        poolingEffectName: HitBox
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 1
+          isOnWeapon: 0
+          hitNum: 1
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket:
+        - AttackPointClaw
+        colCenter: {x: -1.12, y: 0, z: 0}
+        colSize: {x: 3, y: 3, z: 3}
+      animFullPath: 
+      hitArea: 0
+  skillIcon: {fileID: 0}
+  skillName: 
+  skillDesc: 
+  skillClass: 
+  coolTime: 2
+  manaCost: 0
+  range: 5
+  damage: 3
+  damageIncreasePercentPoint: 3
+  castTime: 3
+  skillNO: 1
+  skillLevel: 0
+  openLevel: 0
+  skillType: 2
+  handle: -1
+  alias: WolfAttack1_Craw

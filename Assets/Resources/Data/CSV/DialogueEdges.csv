@@ -1,0 +1,18 @@
+EventName,FromNodeID,ToNodeID,ButtonLabel,Type
+마을 이장에게 말걸기,0,1,NEXT,
+,1,2,NEXT,
+,2,3,수락한다.,ACCEPT
+END,2,4,거절한다.,TURN_DOWN
+메구미에게 옷 받기,0,1,수락한다.,ACCEPT
+,1,2,NEXT,
+,2,3,NEXT,
+,0,4,거절한다.,TURN_DOWN
+END,4,5,NEXT,
+메구미 장비 착용,0,-1,받는다.,ACCEPT
+메구미 포션 기부,0,1,받는다.,ACCEPT
+,1,2,NEXT,
+END,2,-1,END,
+문지기의 부탁,0,1,수락한다.,ACCEPT
+END,0,2,거절한다.,TURN_DOWN
+늑대영역 조사결과,0,-1,수락한다.,ACCEPT
+늑대 사냥 완료,0,-1,받는다.,ACCEPT

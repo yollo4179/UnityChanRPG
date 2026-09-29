@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: PlayerDevideEarth
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: UpperSlash
+      events:
+      - eventName: 1
+        startTime: 0.37
+        endTime: 0.85
+        poolingEffectName: 
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 0, y: 0, z: 0}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      - eventName: 2
+        startTime: 0.65
+        endTime: 0.85
+        poolingEffectName: Holy_hit
+        effectSetting:
+          localPosition: {x: -0.2048, y: 0.291, z: 1.1288}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 1
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      animFullPath: Base Layer.Skills.PlayerDevideEarth@Player
+      hitArea: 2
+  skillIcon: {fileID: 21300000, guid: b11f9c52da2945740b5078d84177a9ab, type: 3}
+  skillName: "\uB300\uC9C0 \uAC00\uB974\uAE30\n"
+  skillDesc: "\uB545\uC744 \uCC0D\uC5B4 \uB300\uC9C0\uB97C \uAC00\uB978\uB2E4."
+  skillClass: Active
+  coolTime: 3
+  manaCost: 10
+  range: 10
+  damage: 30
+  damageIncreasePercentPoint: 3
+  castTime: 5
+  skillNO: 5
+  skillLevel: 1
+  openLevel: 0
+  skillType: 2
+  handle: 7006
+  alias: RushAttack

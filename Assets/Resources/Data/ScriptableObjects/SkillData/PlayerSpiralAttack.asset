@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: PlayerSpiralAttack
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: SpiralAttack
+      events:
+      - eventName: 1
+        startTime: 0.15
+        endTime: 0.7
+        poolingEffectName: 
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 0, y: 0, z: 0}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      - eventName: 2
+        startTime: 0.15
+        endTime: 0.85
+        poolingEffectName: Sparks_red
+        effectSetting:
+          localPosition: {x: -0.0241, y: 1.0475, z: -0.0013}
+          localRotation: {x: 40.23, y: 105.42, z: 82.38}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 1
+          isOnWeapon: 1
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      animFullPath: Base Layer.Skills.PlayerSpiralAttack@Player
+      hitArea: 2
+  skillIcon: {fileID: 21300000, guid: c890dd06d4a350946ab11e4778bf47d8, type: 3}
+  skillName: "\uD68C\uC804 \uBC30\uAE30"
+  skillDesc: "\uD68C\uC804\uD558\uBA70 \uC804\uBC29\uC758 \uC801\uC744 \uD729\uC4F8\uBA70
+    1\uD68C \uACF5\uACA9\uD55C\uB2E4."
+  skillClass: Active
+  coolTime: 3
+  manaCost: 10
+  range: 10
+  damage: 25
+  damageIncreasePercentPoint: 3
+  castTime: 5
+  skillNO: 3
+  skillLevel: 2
+  openLevel: 0
+  skillType: 2
+  handle: 7003
+  alias: RushAttack

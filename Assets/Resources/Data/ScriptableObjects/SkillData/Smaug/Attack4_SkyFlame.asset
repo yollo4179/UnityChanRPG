@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: Attack4_SkyFlame
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: 
+      events:
+      - eventName: 2
+        startTime: 0.24
+        endTime: 0.87
+        poolingEffectName: SmaugMeteor
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: -90, z: 0}
+          localScale: {x: 3.21, y: 3.21, z: 3.21}
+          isLoop: 1
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket:
+        - BreathWidePoint
+        colCenter: {x: 0, y: 0, z: 0}
+        colSize: {x: 0, y: 0, z: 0}
+      - eventName: 1
+        startTime: 0.24
+        endTime: 0.87
+        poolingEffectName: HitBox
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 10.4, y: 2.38, z: 13.67}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 5
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket:
+        - BreathWidePoint
+        colCenter: {x: 0, y: 0, z: 3.58}
+        colSize: {x: 1.65, y: 1.48, z: 8.8}
+      animFullPath: 
+      hitArea: 2
+  skillIcon: {fileID: 0}
+  skillName: 
+  skillDesc: 
+  skillClass: 
+  coolTime: 3
+  manaCost: -1
+  range: 5
+  damage: 50
+  damageIncreasePercentPoint: 5.39
+  buffInfo: []
+  skillNO: 3
+  skillLevel: 5
+  openLevel: 5
+  skillType: 2
+  handle: 3
+  alias: 0

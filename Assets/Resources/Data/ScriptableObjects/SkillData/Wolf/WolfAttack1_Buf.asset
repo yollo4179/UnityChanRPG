@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: WolfAttack1_Buf
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: Buff
+      events:
+      - eventName: 2
+        startTime: 0.1
+        endTime: 0.9
+        poolingEffectName: Wolf_HealingCircle
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 1
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket:
+        - AttackPointFront
+        colCenter: {x: 0, y: 0, z: 0}
+        colSize: {x: 0, y: 0, z: 0}
+      - eventName: 6
+        startTime: 0.1
+        endTime: 0.9
+        poolingEffectName: 
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 1
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+        colCenter: {x: 0, y: 0, z: 0}
+        colSize: {x: 0, y: 0, z: 0}
+      animFullPath: 
+      hitArea: 0
+  skillIcon: {fileID: 0}
+  skillName: Wolf Buff Random
+  skillDesc: Wolf Buff Random
+  skillClass: Buff
+  coolTime: -1
+  manaCost: -1
+  range: -1
+  damage: -1
+  damageIncreasePercentPoint: -1
+  buffInfo:
+  - buffType: 0
+    duration: 10
+    value: 15
+  - buffType: 6
+    duration: 10
+    value: 100
+  - buffType: 4
+    duration: 0
+    value: 20
+  - buffType: 7
+    duration: 5
+    value: 10
+  skillNO: 0
+  skillLevel: -1
+  openLevel: -1
+  skillType: 3
+  handle: -1
+  alias: WolfHealing

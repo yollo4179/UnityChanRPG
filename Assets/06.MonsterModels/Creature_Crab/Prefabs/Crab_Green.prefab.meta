@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d8d4d2c4e22d5294abe74dcb24776383
+timeCreated: 1508598404
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 97918
+  packageName: Creature Crab
+  packageVersion: 1.4
+  assetPath: Assets/Creature_Crab/Prefabs/Crab_Green.prefab
+  uploadId: 207467

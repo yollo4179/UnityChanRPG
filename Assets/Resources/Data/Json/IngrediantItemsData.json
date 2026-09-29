@@ -1,0 +1,122 @@
+[
+  {
+    "ItemID": 100,
+    "Type": "INGREDIENT",
+    "ItemName": "양배추",
+    "SpriteName": "Cabbage",
+    "Explanation": "양배추이다.음식의 재료로 쓰인다",
+    "Price": 500
+  },
+  {
+    "ItemID": 101,
+    "Type": "INGREDIENT",
+    "ItemName": "당근",
+    "SpriteName": "Carrot",
+    "Explanation": "당근이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 102,
+    "Type": "INGREDIENT",
+    "ItemName": "옥수수",
+    "SpriteName": "Corn",
+    "Explanation": "옥수수이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 103,
+    "Type": "INGREDIENT",
+    "ItemName": "오이",
+    "SpriteName": "Cucumber",
+    "Explanation": "오이이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 104,
+    "Type": "INGREDIENT",
+    "ItemName": "가지",
+    "SpriteName": "Eggplant",
+    "Explanation": "가지이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 105,
+    "Type": "INGREDIENT",
+    "ItemName": "파프리카",
+    "SpriteName": "Green_bell_pepper",
+    "Explanation": "파프리카이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 106,
+    "Type": "INGREDIENT",
+    "ItemName": "양파",
+    "SpriteName": "Onion",
+    "Explanation": "양파이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 107,
+    "Type": "INGREDIENT",
+    "ItemName": "파인애플",
+    "SpriteName": "Pineapple",
+    "Explanation": "파인애플이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 108,
+    "Type": "INGREDIENT",
+    "ItemName": "감자",
+    "SpriteName": "Potato",
+    "Explanation": "감자이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 109,
+    "Type": "INGREDIENT",
+    "ItemName": "호박",
+    "SpriteName": "Pumpkin",
+    "Explanation": "호박이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 110,
+    "Type": "INGREDIENT",
+    "ItemName": "시금치",
+    "SpriteName": "Spinach",
+    "Explanation": "시금치이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 111,
+    "Type": "INGREDIENT",
+    "ItemName": "딸기",
+    "SpriteName": "Strawberry",
+    "Explanation": "딸기이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 112,
+    "Type": "INGREDIENT",
+    "ItemName": "고구마",
+    "SpriteName": "Sweet_potato",
+    "Explanation": "고구미이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 113,
+    "Type": "INGREDIENT",
+    "ItemName": "토마토",
+    "SpriteName": "Tomato",
+    "Explanation": "토마토이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  },
+  {
+    "ItemID": 114,
+    "Type": "INGREDIENT",
+    "ItemName": "순무",
+    "SpriteName": "Turnip",
+    "Explanation": "순무이다. 음식의 재료로 쓰인다.",
+    "Price": 500
+  }
+]

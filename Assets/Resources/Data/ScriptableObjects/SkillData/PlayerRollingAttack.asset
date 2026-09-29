@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: PlayerRollingAttack
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: RollingAttack
+      events:
+      - eventName: 1
+        startTime: 0.25
+        endTime: 0.85
+        poolingEffectName: 
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 0, y: 0, z: 0}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      - eventName: 2
+        startTime: 0.7
+        endTime: 0.85
+        poolingEffectName: Sparks_explode_white
+        effectSetting:
+          localPosition: {x: -0.622, y: 0.75, z: 1.07}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 1
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      animFullPath: Base Layer.Skills.PlayerRollingAttack@Player
+      hitArea: 2
+  skillIcon: {fileID: 21300000, guid: 917871e5c6d34ed4b93dfafad1277db5, type: 3}
+  skillName: "\uB864\uB9C1 \uC5B4\uD0DD"
+  skillDesc: "\uC704\uB85C \uB6F0\uC5B4\uC624\uB978 \uD6C4, \uC804\uBC29\uC73C\uB85C
+    \uD68C\uC804\uD558\uBA70 \uAC80\uC744 \uB545\uC5D0 \uB0B4\uB824 \uAF42\uB294\uB2E4."
+  skillClass: Active
+  coolTime: 3
+  manaCost: 10
+  range: 10
+  damage: 25
+  damageIncreasePercentPoint: 3
+  castTime: 15
+  skillNO: 4
+  skillLevel: 1
+  openLevel: 0
+  skillType: 2
+  handle: 7004
+  alias: RushAttack

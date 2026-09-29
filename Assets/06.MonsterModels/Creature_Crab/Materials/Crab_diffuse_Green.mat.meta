@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b74477d4364e81d478cd9dc7220a481e
+timeCreated: 1508598826
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 97918
+  packageName: Creature Crab
+  packageVersion: 1.4
+  assetPath: Assets/Creature_Crab/Materials/Crab_diffuse_Green.mat
+  uploadId: 207467

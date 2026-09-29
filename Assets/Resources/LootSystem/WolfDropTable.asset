@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aa80a4f21652164d8ac37ff492439b4, type: 3}
+  m_Name: WolfDropTable
+  m_EditorClassIdentifier: 
+  GuaranteedLootTable:
+  - Weight: 100
+    Drop: {fileID: 1000011365394840, guid: 5142a683d65bbf84abea6f07db9099c7, type: 3}
+    MinCountItem: 4
+    MaxCountItem: 5
+  OneItemFromList:
+  - Weight: 300
+    Drop: {fileID: 1000012970591572, guid: 7cafb89b5a0f61f479d0a748962abbbc, type: 3}
+    MinCountItem: 1
+    MaxCountItem: 1
+  - Weight: 300
+    Drop: {fileID: 1000013317980782, guid: 2cf6690298568294cb6b655c0a3aeb87, type: 3}
+    MinCountItem: 1
+    MaxCountItem: 1
+  - Weight: 30
+    Drop: {fileID: 1000014038691284, guid: efebddd0b5766bd499be8b63f581de68, type: 3}
+    MinCountItem: 1
+    MaxCountItem: 1
+  WeightToNoDrop: 100
+  DefualtAdditionalDropCount: 1
+  DefualtMinDropRange: 1
+  DefualtMaxDropRange: 2

@@ -1,0 +1,22 @@
+[
+  { "Level": 1,  "Attack": 10, "Defense": 5, "CriChance": 5, "CriDemage": 10, "MaxHP": 150, "MaxMP": 100, "SkillPoint": 1, "ExtraAbilityPoints": 0, "TotalExp": 12 },
+  { "Level": 2,  "Attack": 2,  "Defense": 1, "CriChance": 0, "CriDemage": 1,  "MaxHP": 20,  "MaxMP": 8,   "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 20 },
+  { "Level": 3,  "Attack": 2,  "Defense": 1, "CriChance": 0, "CriDemage": 1,  "MaxHP": 20,  "MaxMP": 8,   "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 28 },
+  { "Level": 4,  "Attack": 2,  "Defense": 1, "CriChance": 0, "CriDemage": 1,  "MaxHP": 20,  "MaxMP": 8,   "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 36 },
+  { "Level": 5,  "Attack": 3,  "Defense": 1, "CriChance": 1, "CriDemage": 2,  "MaxHP": 25,  "MaxMP": 10,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 44 },
+  { "Level": 6,  "Attack": 3,  "Defense": 1, "CriChance": 0, "CriDemage": 1,  "MaxHP": 25,  "MaxMP": 10,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 52 },
+  { "Level": 7,  "Attack": 3,  "Defense": 1, "CriChance": 0, "CriDemage": 1,  "MaxHP": 25,  "MaxMP": 10,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 60 },
+  { "Level": 8,  "Attack": 3,  "Defense": 1, "CriChance": 0, "CriDemage": 1,  "MaxHP": 25,  "MaxMP": 10,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 68 },
+  { "Level": 9,  "Attack": 3,  "Defense": 1, "CriChance": 0, "CriDemage": 1,  "MaxHP": 25,  "MaxMP": 10,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 76 },
+  { "Level": 10, "Attack": 4,  "Defense": 2, "CriChance": 1, "CriDemage": 2,  "MaxHP": 30,  "MaxMP": 12,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 84 },
+  { "Level": 11, "Attack": 4,  "Defense": 2, "CriChance": 0, "CriDemage": 1,  "MaxHP": 30,  "MaxMP": 12,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 92 },
+  { "Level": 12, "Attack": 4,  "Defense": 2, "CriChance": 0, "CriDemage": 1,  "MaxHP": 30,  "MaxMP": 12,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 100 },
+  { "Level": 13, "Attack": 4,  "Defense": 2, "CriChance": 0, "CriDemage": 1,  "MaxHP": 30,  "MaxMP": 12,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 108 },
+  { "Level": 14, "Attack": 4,  "Defense": 2, "CriChance": 0, "CriDemage": 1,  "MaxHP": 30,  "MaxMP": 12,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 116 },
+  { "Level": 15, "Attack": 5,  "Defense": 2, "CriChance": 1, "CriDemage": 2,  "MaxHP": 35,  "MaxMP": 15,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 124 },
+  { "Level": 16, "Attack": 5,  "Defense": 2, "CriChance": 0, "CriDemage": 1,  "MaxHP": 35,  "MaxMP": 15,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 132 },
+  { "Level": 17, "Attack": 5,  "Defense": 2, "CriChance": 0, "CriDemage": 1,  "MaxHP": 35,  "MaxMP": 15,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 140 },
+  { "Level": 18, "Attack": 5,  "Defense": 2, "CriChance": 0, "CriDemage": 1,  "MaxHP": 35,  "MaxMP": 15,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 148 },
+  { "Level": 19, "Attack": 5,  "Defense": 2, "CriChance": 0, "CriDemage": 1,  "MaxHP": 35,  "MaxMP": 15,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 156 },
+  { "Level": 20, "Attack": 6,  "Defense": 3, "CriChance": 1, "CriDemage": 2,  "MaxHP": 40,  "MaxMP": 18,  "SkillPoint": 1, "ExtraAbilityPoints": 1, "TotalExp": 164 }
+]

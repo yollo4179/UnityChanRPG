@@ -1,0 +1,74 @@
+[
+  {
+    "MonsterID": 1000,
+    "Name": "늑대",
+    "Level": 3,
+    "Attack": 10,
+    "Defense": 5,
+    "CriChance": 5,
+    "CriDemage": 5,
+    "MaxHP": 200,
+    "DropExp": 4,
+    "DropMoney": 20
+  },
+  {
+    "MonsterID": 1001,
+    "Name": "미노타우르스",
+    "Level": 6,
+    "Attack": 15,
+    "Defense": 40,
+    "CriChance": 15,
+    "CriDemage": 30,
+    "MaxHP": 400,
+    "DropExp": 10,
+    "DropMoney": 30
+  },
+  {
+    "MonsterID": 1002,
+    "Name": "펌프킨",
+    "Level": 10,
+    "Attack": 20,
+    "Defense": 7,
+    "CriChance": 5,
+    "CriDemage": 5,
+    "MaxHP": 600,
+    "DropExp": 13,
+    "DropMoney": 60
+  },
+  {
+    "MonsterID": 1003,
+    "Name": "미노타우르스",
+    "Level": 15,
+    "Attack": 30,
+    "Defense": 7,
+    "CriChance": 5,
+    "CriDemage": 5,
+    "MaxHP": 650,
+    "DropExp": 55,
+    "DropMoney": 100
+  },
+  {
+    "MonsterID": 1004,
+    "Name": "식인충",
+    "Level": 17,
+    "Attack": 40,
+    "Defense": 8,
+    "CriChance": 5,
+    "CriDemage": 5,
+    "MaxHP": 4000,
+    "DropExp": 75,
+    "DropMoney": 1000
+  },
+  {
+    "MonsterID": 1005,
+    "Name": "오크",
+    "Level": 20,
+    "Attack": 50,
+    "Defense": 10,
+    "CriChance": 5,
+    "CriDemage": 5,
+    "MaxHP": 5000,
+    "DropExp": 95,
+    "DropMoney": 1500
+  }
+]

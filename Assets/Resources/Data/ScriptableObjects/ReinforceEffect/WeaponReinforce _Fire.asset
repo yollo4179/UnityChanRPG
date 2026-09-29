@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c63d8d6ac7036e48992a0246ee5ed98, type: 3}
+  m_Name: WeaponReinforce _Fire
+  m_EditorClassIdentifier: 
+  ReinforceEffectPrefabs:
+  - EffectPrefab: {fileID: 2415447811048438670, guid: a769e00184958fc4a8b93258b8c2848a, type: 3}
+    Description: 
+    Level: 2
+  - EffectPrefab: {fileID: 7569748353520111345, guid: 3860233472cf7e541a5238212e9990c5, type: 3}
+    Description: 
+    Level: 5
+  - EffectPrefab: {fileID: 1537971033341231097, guid: 9ac48c5220c6783498d732ab65db5c13, type: 3}
+    Description: 
+    Level: 8
+  Element: 1

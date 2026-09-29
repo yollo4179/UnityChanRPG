@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c63d8d6ac7036e48992a0246ee5ed98, type: 3}
+  m_Name: WeaponReinforce_Ice
+  m_EditorClassIdentifier: 
+  ReinforceEffectPrefabs:
+  - EffectPrefab: {fileID: 1693668491800532447, guid: eb141fbb202735149ac4b9749604f664, type: 3}
+    Description: 
+    Level: 2
+  - EffectPrefab: {fileID: 8662731430913487513, guid: fcb9916432ec5e646b1c1f99fc1706ca, type: 3}
+    Description: 
+    Level: 5
+  - EffectPrefab: {fileID: 7538291151217991452, guid: c4a0e91455eca50439e68dabb3b902b8, type: 3}
+    Description: 
+    Level: 8
+  Element: 2

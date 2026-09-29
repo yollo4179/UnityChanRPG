@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: WolfAttack3_Poke
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: Attack3_Poke
+      events:
+      - eventName: 2
+        startTime: 0.55
+        endTime: 0.9
+        poolingEffectName: Wolf_GreenHit
+        effectSetting:
+          localPosition: {x: 0, y: 0.5899959, z: 7}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 3, y: 3, z: 3}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket:
+        - AttackPointFront
+        colCenter: {x: 0, y: 0, z: 0}
+        colSize: {x: 0, y: 0, z: 0}
+      - eventName: 1
+        startTime: 0.5
+        endTime: 0.6
+        poolingEffectName: 0
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 1
+        poolingProjectileKey: HitBox
+        numProjectiles: 0
+        spawnSocket:
+        - AttackPointFront
+        colCenter: {x: 0, y: 0, z: 5}
+        colSize: {x: 3, y: 3, z: 5}
+      animFullPath: 
+      hitArea: 0
+  skillIcon: {fileID: 0}
+  skillName: "\uB291\uB300\uC758 \uCC0D\uAE30 \uACF5\uACA9"
+  skillDesc: "\uB297\uB300\uAC00 \uAE30 \uACF5\uACA9 \uC218\uD589"
+  skillClass: Melee Active
+  coolTime: -1
+  manaCost: -1
+  range: -1
+  damage: 3
+  damageIncreasePercentPoint: -1
+  castTime: 2
+  skillNO: 2
+  skillLevel: -1
+  openLevel: -1
+  skillType: 2
+  handle: -1
+  alias: 

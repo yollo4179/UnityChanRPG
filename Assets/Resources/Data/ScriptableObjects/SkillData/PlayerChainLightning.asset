@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: PlayerChainLightning
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: ChainLightning
+      events:
+      - eventName: 5
+        startTime: 0.27
+        endTime: 1
+        poolingEffectName: 
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 0, y: 0, z: 0}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: ChainLightningProj_Prefab
+        numProjectiles: 1
+        spawnSocket:
+        - Weapon_Tip_ND
+      animFullPath: Base Layer.Skills.PlayerPokingHeart@Player
+      hitArea: 2
+  skillIcon: {fileID: 21300000, guid: 03e6f50b7a998ed46a4c3f9f8cb0855e, type: 3}
+  skillName: "\uCCB4\uC778 \uB77C\uC774\uD2B8\uB2DD"
+  skillDesc: "\uAC00\uC7A5 \uAC00\uAE4C\uC774 \uC788\uB294 \uC801\uB4E4\uC744 \uC5F0\uC1C4\uC801\uC73C\uB85C
+    \uAD00\uD1B5\uD558\uB294 \uC804\uAE30 \uACF5\uACA9\uC744 \uC218\uD589\uD55C\uB2E4. "
+  skillClass: Active
+  coolTime: 10
+  manaCost: 15
+  range: 10
+  damage: 70
+  damageIncreasePercentPoint: 5
+  castTime: 10
+  skillNO: 1
+  skillLevel: 1
+  openLevel: 0
+  skillType: 1
+  handle: 7001
+  alias: ChainLightning

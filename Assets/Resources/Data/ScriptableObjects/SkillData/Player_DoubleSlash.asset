@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96216d2c5ffa90643b1f95bbdfaf0405, type: 3}
+  m_Name: Player_DoubleSlash
+  m_EditorClassIdentifier: 
+  stateNodeEvents:
+    eventClips:
+    - clipName: DoubleSlash
+      events:
+      - eventName: 1
+        startTime: 0.37
+        endTime: 0.54
+        poolingEffectName: 
+        effectSetting:
+          localPosition: {x: 0, y: 0, z: 0}
+          localRotation: {x: 0, y: 0, z: 0}
+          localScale: {x: 0, y: 0, z: 0}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      - eventName: 2
+        startTime: 0.37
+        endTime: 0.89
+        poolingEffectName: Slash_Multi_Blue
+        effectSetting:
+          localPosition: {x: 0, y: 1, z: -0.5}
+          localRotation: {x: 0, y: 180, z: 0}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      - eventName: 1
+        startTime: 0.64
+        endTime: 0.8
+        poolingEffectName: Slash_Multi_Blue
+        effectSetting:
+          localPosition: {x: 0, y: 1, z: -0.5}
+          localRotation: {x: 0, y: 180, z: 0}
+          localScale: {x: 1, y: 1, z: 1}
+          isLoop: 0
+          delayEffectActive: 0
+          isOnWeapon: 0
+          hitNum: 0
+        poolingProjectileKey: 
+        numProjectiles: 0
+        spawnSocket: []
+      animFullPath: Base Layer.Skills.PlayerRushAttack@Player
+      hitArea: 2
+  skillIcon: {fileID: 21300000, guid: 3925691c2a021aa429c1dc89712a1253, type: 3}
+  skillName: "\uB354\uBE14 \uC2AC\uB798\uC2DC"
+  skillDesc: "\uC804\uBC29\uC73C\uB85C \uB3CC\uC9C4\uD558\uBA70 \uC801\uB4E4\uC744
+    3\uBC88 \uAC00\uACA9\uD55C\uB2E4."
+  skillClass: Active
+  coolTime: 3
+  manaCost: 10
+  range: 10
+  damage: 25
+  damageIncreasePercentPoint: 3
+  castTime: 5
+  skillNO: 0
+  skillLevel: 1
+  openLevel: 0
+  skillType: 2
+  handle: 7000
+  alias: RushAttack

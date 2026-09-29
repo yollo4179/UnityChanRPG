@@ -1,0 +1,31 @@
+ItemID,Type,ItemName,SpriteName,Amount,ExtraAttack,ExtraDefense,ExtraCriChance,ExtraCriDemage,ExtraHP,ExtraMP
+100,CONSUMABLE,Cabbage,Cabbage,0,0,0,0,0,0,0
+101,CONSUMABLE,Cabbage seeds,Cabbage_seeds,0,0,0,0,0,0,0
+102,CONSUMABLE,Carrot,Carrot,0,0,0,0,0,0,0
+103,CONSUMABLE,Carrot seeds,Carrot_seeds,0,0,0,0,0,0,0
+104,CONSUMABLE,Corn,Corn,0,0,0,0,0,0,0
+105,CONSUMABLE,Corn seeds,Corn_seeds,0,0,0,0,0,0,0
+106,CONSUMABLE,Cucumber,Cucumber,0,0,0,0,0,0,0
+107,CONSUMABLE,Cucumber seeds,Cucumber_seeds,0,0,0,0,0,0,0
+108,CONSUMABLE,Eggplant,Eggplant,0,0,0,0,0,0,0
+109,CONSUMABLE,Eggplant seeds,Eggplant_seeds,0,0,0,0,0,0,0
+110,CONSUMABLE,Green bell pepper,Green_bell_pepper,0,0,0,0,0,0,0
+111,CONSUMABLE,Green bell pepper seeds,Green_bell_pepper_seeds,0,0,0,0,0,0,0
+112,CONSUMABLE,Onion,Onion,0,0,0,0,0,0,0
+113,CONSUMABLE,Onion seeds,Onion_seeds,0,0,0,0,0,0,0
+114,CONSUMABLE,Pineapple,Pineapple,0,0,0,0,0,0,0
+115,CONSUMABLE,Pineapple seeds,Pineapple_seeds,0,0,0,0,0,0,0
+116,CONSUMABLE,Potato,Potato,0,0,0,0,0,0,0
+117,CONSUMABLE,Potato seeds,Potato_seeds,0,0,0,0,0,0,0
+118,CONSUMABLE,Pumpkin,Pumpkin,0,0,0,0,0,0,0
+119,CONSUMABLE,Pumpkin seeds,Pumpkin_seeds,0,0,0,0,0,0,0
+120,CONSUMABLE,Spinach,Spinach,0,0,0,0,0,0,0
+121,CONSUMABLE,Spinach seeds,Spinach_seeds,0,0,0,0,0,0,0
+122,CONSUMABLE,Strawberry,Strawberry,0,0,0,0,0,0,0
+123,CONSUMABLE,Strawberry seeds,Strawberry_seeds,0,0,0,0,0,0,0
+124,CONSUMABLE,Sweet potato,Sweet_potato,0,0,0,0,0,0,0
+125,CONSUMABLE,Sweet potato seeds,Sweet_potato_seeds,0,0,0,0,0,0,0
+126,CONSUMABLE,Tomato,Tomato,0,0,0,0,0,0,0
+127,CONSUMABLE,Tomato seeds,Tomato_seeds,0,0,0,0,0,0,0
+128,CONSUMABLE,Turnip,Turnip,0,0,0,0,0,0,0
+129,CONSUMABLE,Turnip seeds,Turnip_seeds,0,0,0,0,0,0,0
