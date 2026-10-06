@@ -36,6 +36,8 @@ public class PlayerManager
        {
             PlayerLevelData DataLevelOne =  m_DicPlayerLevelData[1];
             LevelUp(1);
+            m_PlayerInfo.Money = 5000;
+            m_PlayerInfo.SavePlayerInfo();
        }
 
         _playerSkillsInfo = new PlayerSkillsInfo();
@@ -67,7 +69,12 @@ public class PlayerManager
     {
         m_PlayerInfo.Money = m_PlayerInfo.Money+Amount;
         GameObject invenGO = Managers.UI.GetCachedUIByName("InventoryPannel_Canvas_Prefab"); //인벤 정보(돈) 업데이트
-        invenGO.GetComponentInChildren<InventoryDirector>().TextMoney.text = m_PlayerInfo.Money.ToString();
+        if (invenGO != null)
+        {
+            InventoryDirector director = invenGO.GetComponentInChildren<InventoryDirector>();
+            if (director != null && director.TextMoney != null)
+                director.TextMoney.text = m_PlayerInfo.Money.ToString();
+        }
 
     }
     void LevelUp(int NextLevel)
@@ -133,21 +140,30 @@ public class PlayerManager
     public void AddEXP(int extraEXP)
     {
         LevelPrev =m_PlayerInfo.Level;
-  
-        int Sum = 0;
-        if (m_PlayerInfo.TotalExp < (Sum =m_PlayerInfo.CurExp + extraEXP))
+        int remaining = extraEXP;
+        while (remaining > 0)
         {
-            int MarginExp = Sum - m_PlayerInfo.TotalExp;
-            LevelUp(m_PlayerInfo.Level+1);
-            m_PlayerInfo.CurExp=MarginExp;
-        }
-        else
-        {
-            m_PlayerInfo.CurExp=Sum;
+            int needed = Math.Max(1, m_PlayerInfo.TotalExp - m_PlayerInfo.CurExp);
+            if (remaining < needed)
+            {
+                m_PlayerInfo.CurExp += remaining;
+                break;
+            }
+            if (!m_DicPlayerLevelData.ContainsKey(m_PlayerInfo.Level + 1))
+            {
+                m_PlayerInfo.CurExp = m_PlayerInfo.TotalExp;
+                break;
+            }
+            remaining -= needed;
+            LevelUp(m_PlayerInfo.Level + 1);
+            m_PlayerInfo.CurExp = 0;
         }
         if (null ==_statusBar)
-            _statusBar = Managers.UI.GetOpenUIByName("HUD_Canvas_Prefab").GetComponentInChildren<UI_PlayerStatusBar>();
-        _statusBar.UpdateSlider(null, Player.ePlayerSlider.EXP);
+        {
+            GameObject hud = Managers.UI.GetOpenUIByName("HUD_Canvas_Prefab");
+            if (hud != null) _statusBar = hud.GetComponentInChildren<UI_PlayerStatusBar>();
+        }
+        if (_statusBar != null) _statusBar.UpdateSlider(null, Player.ePlayerSlider.EXP);
 
     }
     protected  void Subscribe()

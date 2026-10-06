@@ -21,7 +21,18 @@ namespace Smaug
 public class SmaugController : MonsterController
 {
     [SerializeField] List<Smaug.SkillSet> _smaugSkillSet = new List<Smaug.SkillSet>();
+    [SerializeField] private SkillSO _enragedHeadSkill;
     Animator _animator;
+
+    public SkillSO GetSkillForAnimation(int animationSkillNo, float healthRatio)
+    {
+        if (animationSkillNo == (int)Smaug.eSmaugState.STATE_ATTACK1_HEAD &&
+            healthRatio <= 0.5f && _enragedHeadSkill != null)
+            return _enragedHeadSkill;
+
+        return GetSkillSOByHandle(animationSkillNo);
+    }
+
     public void Awake()
     {
         _animator = GetComponent<Animator>();

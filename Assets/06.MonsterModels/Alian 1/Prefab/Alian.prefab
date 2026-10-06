@@ -224,6 +224,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 919132149155446097, guid: ed75f2ca71f56824eb3fd56e96bd0682, type: 3}
+      propertyPath: m_TagString
+      value: Enemies
+      objectReference: {fileID: 0}
     - target: {fileID: -9173562861372171434, guid: ed75f2ca71f56824eb3fd56e96bd0682, type: 3}
       propertyPath: m_Layer
       value: 8
@@ -1587,6 +1591,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ed75f2ca71f56824eb3fd56e96bd0682, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 114900000000000022}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ed75f2ca71f56824eb3fd56e96bd0682, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 2792697592146495522}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ed75f2ca71f56824eb3fd56e96bd0682, type: 3}
       insertIndex: -1
@@ -2039,3 +2046,16 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4436805663696350335, guid: ed75f2ca71f56824eb3fd56e96bd0682, type: 3}
   m_PrefabInstance: {fileID: 5631956226813568946}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &114900000000000022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4821617460195662563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17c12b224b2e8384eb5459de365628bb, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  lootTable: {fileID: 11400000, guid: 3579815b44d549444bf2586ac887f30d, type: 2}

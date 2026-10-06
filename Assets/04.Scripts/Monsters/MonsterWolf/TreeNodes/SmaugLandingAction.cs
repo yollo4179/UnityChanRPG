@@ -15,10 +15,14 @@ public partial class SmaugLandingAction : Action
     int _targetStateHash;
 
     Animator _animator;
-    bool hasInitialized = false; 
+    bool hasInitialized = false;
+    float _landingStartTime;
+    bool _landingTriggered;
     protected override Status OnStart()
     {
         if(null==_animator) _animator = _self.Value.GetComponent<Animator>();
+        _landingStartTime = Time.time;
+        _landingTriggered = false;
         if(true==hasInitialized)return Status.Running;
         hasInitialized = true;
         _landingHash = Animator.StringToHash("Base Layer.FlyLocomotion.Land");
@@ -29,23 +33,29 @@ public partial class SmaugLandingAction : Action
 
     protected override Status OnUpdate()
     {
-        if(_animator.GetCurrentAnimatorStateInfo(0).fullPathHash !=_landingHash)
+        int currentState = _animator.GetCurrentAnimatorStateInfo(0).fullPathHash;
+        if (currentState == _targetStateHash)
+            return Status.Success;
+
+        if (!_landingTriggered && currentState != _landingHash)
         {
             _animator.SetTrigger(_landingTriggerHash);
+            _landingTriggered = true;
         }
 
-        if(_animator.GetCurrentAnimatorStateInfo(0).fullPathHash  ==_targetStateHash)
+        if (Time.time - _landingStartTime > 12f)
         {
+            Debug.LogWarning("Smaug landing timed out; returning to battle", _self.Value);
+            _animator.CrossFade("Base Layer.BattleLocomotion", 0.15f);
             return Status.Success;
         }
-
 
         return Status.Running;
     }
 
     protected override void OnEnd()
     {
-        _state.Value = eEnemyState.CHASE;
+        if (_state.Value != eEnemyState.DEAD) _state.Value = eEnemyState.CHASE;
     }
 }
 

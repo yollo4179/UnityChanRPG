@@ -21,7 +21,9 @@ public static class NavMeshZoneFilter
         int numCols = Physics.OverlapSphereNonAlloc(
             vPoint,
             1f,
-            _navBuf);
+            _navBuf,
+            LayerMask.GetMask("NavZone"),
+            QueryTriggerInteraction.Collide);
         for(int i=0;i<numCols;++i)
         {
             if (_navBuf[i]&& _navBuf[i].TryGetComponent( out NavMeshKeys ZoneID))

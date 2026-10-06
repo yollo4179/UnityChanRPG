@@ -70,5 +70,17 @@
     "MaxHP": 5000,
     "DropExp": 95,
     "DropMoney": 1500
+  },
+  {
+    "MonsterID": 1006,
+    "Name": "스마우그",
+    "Level": 25,
+    "Attack": 65,
+    "Defense": 15,
+    "CriChance": 5,
+    "CriDemage": 5,
+    "MaxHP": 8000,
+    "DropExp": 250,
+    "DropMoney": 2500
   }
 ]

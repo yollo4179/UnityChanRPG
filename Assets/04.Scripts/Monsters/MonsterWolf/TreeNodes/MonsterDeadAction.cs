@@ -40,10 +40,24 @@ public partial class MonsterDeadAction : Action
         if (false ==_hasInitialized)
         {
             _deathHash = Animator.StringToHash("Base Layer.death");
+            if (!_animator.HasState(0, _deathHash))
+                _deathHash = Animator.StringToHash("Base Layer.Die");
             _deadTriggerHash = Animator.StringToHash("OnDead");
             _hasInitialized = true;
         }
-        _animator.SetTrigger(_deadTriggerHash);
+        _animator.ResetTrigger("OnBattle");
+        _animator.ResetTrigger("OnWander");
+        _animator.ResetTrigger("OnHit");
+        if (_animator.HasState(0, _deathHash))
+            _animator.Play(_deathHash, 0, 0f);
+        else
+            _animator.SetTrigger(_deadTriggerHash);
+        NavMeshAgent agent = _self.Value.GetComponent<NavMeshAgent>();
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+        }
         /*Shader√≥∏Æ*/
         _shader.SetNowMarerial(eShaderEffect.DISOLVE);
         _shader.DoFade(1.3f, -0.3f, 8.5f, eFadeMode.FADE_OUT);
@@ -69,17 +83,8 @@ public partial class MonsterDeadAction : Action
 
     protected override Status OnUpdate()
     {
-        if (
-                //false == _animator.IsInTransition(0)&&
-                _animator.GetCurrentAnimatorStateInfo(0).fullPathHash !=_deathHash)
-        {
-            _animator.SetTrigger(_deadTriggerHash);
-            return Status.Running;
-        }
-            if (_deadDuration.Value <=Time.time  - _deadTime)
-            return Status.Success;
-
-        return Status.Running;
+        // Missing or differently named animation states must not block respawning forever.
+        return Time.time - _deadTime >= _deadDuration.Value ? Status.Success : Status.Running;
     }
 
     protected override void OnEnd()

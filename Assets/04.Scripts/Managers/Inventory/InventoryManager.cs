@@ -41,9 +41,10 @@ public class InventoryManager
     }
     public void RefreshInventory()
     {
-        InvenGridScrollView invenGridScrollView = Managers.UI.GetCachedUIByName("InventoryPannel_Canvas_Prefab")
-            .GetComponentInChildren<InvenGridScrollView>();
-        invenGridScrollView.Refresh();
+        GameObject inventoryUI = Managers.UI.GetCachedUIByName("InventoryPannel_Canvas_Prefab");
+        if (inventoryUI == null) return;
+        InvenGridScrollView invenGridScrollView = inventoryUI.GetComponentInChildren<InvenGridScrollView>();
+        if (invenGridScrollView != null) invenGridScrollView.Refresh();
 
 
     }
@@ -141,6 +142,7 @@ public class InventoryManager
         if (InvenInfo.InfoList.Contains(itemInfo)) return;
         InvenInfo.InfoList.Add(itemInfo);
         RefreshInventory();
+        Managers.Event.Publish(new Event_AcquireItem(itemInfo.ID, itemInfo.Amount));
     }
     public void TryAddItem(eITEMTYPE itemType, int itemID, int amount)
     {
@@ -177,6 +179,8 @@ public class InventoryManager
         }
 
         RefreshInventory();
+        if (amount > 0)
+            Managers.Event.Publish(new Event_AcquireItem(itemID, amount));
     }
     public ItemInfo TryRemoveItem(ItemInfo itemInfo,int amount)
     {

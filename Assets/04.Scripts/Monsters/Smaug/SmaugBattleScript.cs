@@ -1,105 +1,40 @@
-using NUnit.Framework;
-using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
-using System.Collections.Generic;
-using System;
-using Unity.Behavior;
-using System.Linq;
+癤퓎sing UnityEngine;
 
 public class SmaugBattleScript : MonsterBattleScript
 {
-
-    public enum eSmaugMovement
-    { 
+    private enum MovementState
+    {
         Chase,
-        Stop,
-        //MoveToClosestWayPoint,
+        Stop
     }
 
-    [SerializeField]private float _stoppingDuration; //20초 정도
-    BehaviorGraphAgent _btAgent; 
-    private float _stoppingStartTime;
-    private bool _isStopping;
-    private eSmaugMovement _nowMovementType;
-    private eSmaugMovement _nowMovementTypeAfterStop = eSmaugMovement.Chase;
-    List<Vector3> wayPoints;
-    bool _bMoveToWayPoint;
-    Vector3 _targetWayPoint;
-    float _stoppingDistance = 3f;
-    public override void Awake()
+    [SerializeField] private float _resumeChaseOffset = 0.4f;
+    private MovementState _movementState;
+
+    public override void UpdateBattle(bool isFirst)
     {
-        base.Awake();
-        _btAgent = GetComponent<BehaviorGraphAgent>();
+        Vector3 toTarget = VectorUtil.PlatVector(_target.position - transform.position);
+        float distance = toTarget.magnitude;
+        Vector3 targetDirection = distance > 0.001f ? toTarget / distance : Vector3.zero;
 
-    }
-    public override void UpdateBattle(bool isFirst) 
-    {
+        // Hysteresis prevents a stop/chase loop at the stopping distance.
+        if (_movementState == MovementState.Stop && distance > _rangeOffset + _resumeChaseOffset)
+            _movementState = MovementState.Chase;
+        else if (_movementState == MovementState.Chase && distance <= _rangeOffset)
+            _movementState = MovementState.Stop;
 
+        _nowState = _movementState == MovementState.Stop ? eNowState.Stop : eNowState.MoveF;
+        if (_movementState == MovementState.Chase)
+            transform.position += targetDirection * _monsterSpeed * Time.deltaTime;
 
-        Vector3 toTarget = VectorUtil.PlatVector(_target.transform.position - transform.position);
-        float lengthToTargetOnXZ = toTarget.magnitude;
-        toTarget.Normalize();
+        // Keep facing the player so angle-based attacks can start while stopped.
+        if (targetDirection.sqrMagnitude > 0.001f)
+        {
+            Quaternion facing = Quaternion.LookRotation(targetDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, facing, Time.deltaTime * 5f);
+        }
 
-        Vector3 targetDirection = MovingLogic(lengthToTargetOnXZ, toTarget, isFirst);
-        targetDirection = Vector3.RotateTowards(targetDirection, toTarget, Time.deltaTime*3f, Time.deltaTime*5f);
-        UpdateMovement(targetDirection, targetDirection);
-        UpdateRotation(targetDirection, targetDirection);
-        ChooseAnimation(toTarget);
-
+        ChooseAnimation(targetDirection);
         _attackChecker.CheckAttackCondition();
-
-    }
-    public override void UpdateMovement(Vector3 direction, Vector3 lookDir)
-    {
-        if (direction.sqrMagnitude < 0.01f) return;
-        {
-            // 직접 이동
-            transform.position += direction * _monsterSpeed * Time.deltaTime;
-        }
-
-    }
-    public void UpdateRotation(Vector3 direction, Vector3 lookDir)
-    {
-        if (_nowMovementType == eSmaugMovement.Stop) return; 
-            // 부드러운 회전
-            if (direction != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(lookDir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
-        }
-    }
-    public Vector3 MovingLogic(float lengthToTargetOnXZ ,Vector3 toTarget,bool isFirst)
-    {
-        switch (_nowMovementType)
-        {
-            case eSmaugMovement.Chase:
-                {
-                    if (lengthToTargetOnXZ < _rangeOffset)
-                    {
-                        _nowMovementType=eSmaugMovement.Stop;
-                        _stoppingStartTime = Time.time;
-                        break;
-                    }
-                    _nowState = eNowState.MoveF;
-                    return toTarget;
-                }
-            case eSmaugMovement.Stop: 
-                {
-                    _nowState = eNowState.Stop;
-                    if (Time.time - _stoppingStartTime > _stoppingDuration) 
-                    {
-                        _nowMovementType =
-                          (eSmaugMovement)
-                          (((int)_nowMovementType + 1) % Enum.GetValues(typeof(eSmaugMovement)).Length);
-                    }
-                    return Vector3.zero; 
-                }
-            
-                
-
-        }
-        
-
-        return Vector3.zero;
     }
 }

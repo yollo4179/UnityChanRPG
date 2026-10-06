@@ -52,12 +52,13 @@ public partial class SmaugFlyAction : Action
 
         if (null== _animator) _animator = _self.Value.GetComponent<Animator>();
         _isWaitingTimeEnd  = false;
-        _startTime     = Time.deltaTime;
+        _startTime     = Time.time;
         _numVisitPoints = 0;
-        _numGoalVisitPoints = UnityEngine.Random.Range(1, _numMaxVisitPoint);
+        _numGoalVisitPoints = UnityEngine.Random.Range(1, Mathf.Max(2, _numMaxVisitPoint.Value + 1));
         _isNowMoving = false;
         _flySkillNO.Value =1;
-        switch (_flySkillNO)
+        _animator.SetInteger("FlySkillNO", _flySkillNO.Value);
+        switch (_flySkillNO.Value)
         {
             case 0:
                 _isWayPointMode =false;
@@ -67,12 +68,11 @@ public partial class SmaugFlyAction : Action
                 break; 
         
         }
-        CheckAndActivateHash(_battleLocomotionHash, _onFlyTriggerHash);
-
-
-    
-
-        if (true == _hasInitialized) return Status.Running;
+        if (_hasInitialized)
+        {
+            CheckAndActivateHash(_battleLocomotionHash, _onFlyTriggerHash);
+            return Status.Running;
+        }
         _hasInitialized = true;
         _gliderTriggerHash = Animator.StringToHash("OnGlide");
         _onFlyTriggerHash = Animator.StringToHash("OnFly");
@@ -93,6 +93,13 @@ public partial class SmaugFlyAction : Action
 
     protected override Status OnUpdate()
     {
+        if (Time.time - _startTime > 30f)
+        {
+            Debug.LogWarning("Smaug flight timed out; moving to aerial attack", _self.Value);
+            _animator.CrossFade("Base Layer.FlyLocomotion.Fly Float", 0.15f);
+            return Status.Success;
+        }
+
         switch (_isWayPointMode)
         {
             case true:
@@ -126,6 +133,7 @@ public partial class SmaugFlyAction : Action
     }
     private void DoWayPointsRoute()
     {
+        if (_isWaitingTimeEnd) return;
         GetRandomWayPoints();
         MoveToWayPoint();
         if(CheckIfArrived())
@@ -151,9 +159,11 @@ public partial class SmaugFlyAction : Action
 
             for (int i = 0; i<_wayPoints.Value.Count; ++i)
             {
-                if (length > Mathf.Min(length, (_player.position - _wayPoints.Value[i].transform.position).magnitude))
+                float candidateDistance = (_player.position - _wayPoints.Value[i].transform.position).sqrMagnitude;
+                if (candidateDistance < length)
                 {
-                    bestPointIndex =  i;
+                    length = candidateDistance;
+                    bestPointIndex = i;
                 }
             }
             _targetPoint =  _wayPoints.Value[bestPointIndex].transform.position;
@@ -168,8 +178,8 @@ public partial class SmaugFlyAction : Action
 
         Vector3 targetDir = _targetPoint -  _self.Value.transform.position;
         targetDir.Normalize();
-        Vector3 delta = targetDir * _flyingSpeed*Time.deltaTime;
-        _self.Value.transform.position+= delta;
+        _self.Value.transform.position = Vector3.MoveTowards(
+            _self.Value.transform.position, _targetPoint, _flyingSpeed.Value * Time.deltaTime);
         if (targetDir != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(targetDir);

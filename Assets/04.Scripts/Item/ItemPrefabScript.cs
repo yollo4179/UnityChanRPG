@@ -1,101 +1,95 @@
-using System.Collections;
-using System.Linq;
-using Unity.AppUI.UI;
 using UnityEngine;
-
-
 
 public class ItemPrefabScript : MonoBehaviour
 {
-    Collider _trigger;
-    int _amount;
-    public int Amount { get {return _amount; } set { _amount = value;}}
-    [SerializeField] eITEMTYPE _itemType;
-    [SerializeField] int _itemID;
-    StatusScript _itemOwnerStatus; 
-    MonsterInfo _monsterInfo;
-    Poolable _poolable;
-    Coroutine _co;
-    private void Awake()
+    private int _amount = 1;
+    public int Amount { get => _amount; set => _amount = Mathf.Max(1, value); }
+    [SerializeField] private eITEMTYPE _itemType;
+    [SerializeField] private int _itemID;
+    private int _dropMoney;
+    private bool _ready;
+    private bool _collected;
+    private bool _hasLanded;
+    private const float PickupDelayAfterLanding = 0.3f;
+    private float _pickupAllowedAt;
+
+    private void OnEnable()
     {
-        _poolable = GetComponent<Poolable>();
-        _trigger =  GetComponentsInChildren<Collider>(true).FirstOrDefault((x)=>(x.isTrigger ==true));        
+        _amount = 1;
+        _dropMoney = 0;
+        _ready = false;
+        _collected = false;
+        _hasLanded = false;
+        _pickupAllowedAt = float.PositiveInfinity;
+        Rigidbody body = GetComponent<Rigidbody>();
+        if (body != null && !body.isKinematic)
+        {
+            body.linearVelocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
+        }
     }
+
     public void SetOwner(GameObject owner)
     {
-        _itemOwnerStatus = owner.GetComponent<StatusScript>();
-    }
-    private void OnTriggerStay(Collider other)
-    {
-        if(null == _itemOwnerStatus)
+        StatusScript status = owner != null ? owner.GetComponent<StatusScript>() : null;
+        if (_itemType == eITEMTYPE.MONEY && status != null)
         {
+            MonsterInfo monster = Managers.Monster.GetMonsterInfo(status.CharacterID);
+            if (monster != null) _dropMoney = monster.DropMoney;
+        }
+        _ready = true;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        TryCollect(other);
+    }
+
+    private void OnCollisionEnter(Collision collision) => CheckLanding(collision);
+    private void OnCollisionStay(Collision collision) => CheckLanding(collision);
+
+    private void CheckLanding(Collision collision)
+    {
+        if (!_ready || _hasLanded) return;
+        int groundMask = LayerMask.GetMask("Default", "Terrain", "Obstacles");
+        if ((groundMask & (1 << collision.gameObject.layer)) == 0) return;
+        if (collision.collider.GetComponentInParent<StatusScript>() != null) return;
+        for (int i = 0; i < collision.contactCount; i++)
+        {
+            // Side contacts with walls do not count as landing on the floor.
+            if (Vector3.Dot(collision.GetContact(i).normal, Vector3.up) < 0.5f) continue;
+            _hasLanded = true;
+            _pickupAllowedAt = Time.time + PickupDelayAfterLanding;
             return;
         }
-        
-       MonsterInfo _monsterInfo =  Managers.Monster.GetMonsterInfo(_itemOwnerStatus.CharacterID);
-
-        int mask = LayerMask.GetMask("Player");
-        int extraAmount = UnityEngine.Random.Range(1,2); 
-        if ( 0 < (other.includeLayers.value &mask))
-        {
-           switch(_itemType)
-            {
-                    case eITEMTYPE.MONEY:
-                    {
-                    int finalMoney =UnityEngine.Random.Range(_monsterInfo.DropMoney, _monsterInfo.DropMoney*2);
-                    Managers.Player.AddMoney(finalMoney);
-                    break;
-                    }
-                    //아니면 디폴트로 같은 처리,
-                    case eITEMTYPE.CONSUMABLE:
-                    {
-                        Debug.Log($"<color=#00ff00>ItemPrefabScript OnTriggerEnter CONSUMABLE </color>");
-                        Managers.Inventory.TryAddItem(_itemType, _itemID, extraAmount);
-                        break;
-                    }
-                    case eITEMTYPE.EQUIPMENT:
-                    {
-                        Debug.Log($"<color=#00ff00>ItemPrefabScript OnTriggerEnter EQUIPMENT </color>");
-                        Managers.Inventory.TryAddItem(_itemType, _itemID, 1);
-                        break;
-                    }
-                    case eITEMTYPE.QUEST:
-                    {
-                        Debug.Log($"<color=#00ff00>ItemPrefabScript OnTriggerEnter QUEST </color>");
-                        Managers.Inventory.TryAddItem(_itemType, _itemID, 1);
-                        break;
-                    }
-                    case eITEMTYPE.INGREDIENT:
-                    {
-                        Debug.Log($"<color=#00ff00>ItemPrefabScript OnTriggerEnter INGREDIENT </color>");
-                        Managers.Inventory.TryAddItem(_itemType, _itemID, extraAmount);
-                        break;
-                    }
-
-            }
-            _itemOwnerStatus=null;
-
-            ShaderEffects shaderEffects = GetComponent<ShaderEffects>();
-            if (null!= shaderEffects)
-            {
-                if(null == _co)
-                _co=  StartCoroutine(DisolveAndGetBack(shaderEffects));
-            }
-            else
-            {
-                Managers.Pool.GetBack(_poolable);
-            }
-            
-        }
     }
-    IEnumerator DisolveAndGetBack(ShaderEffects shader)
-    {
-        shader.SetNowMarerial(eShaderEffect.DISOLVE);
-        shader.DoFade(1f, -0.3f, 0.5f, eFadeMode.FADE_OUT);
-        yield return new WaitUntil(() => shader.IsFadeEffectDone == true);
 
-        Managers.Pool.GetBack(_poolable);
-        shader.SetNowMarerial(eShaderEffect.ORIGIN);
-        _co=null;
+    private void OnTriggerStay(Collider other)
+    {
+        // Also collect drops that spawned while the player was already overlapping.
+        TryCollect(other);
+    }
+
+    private void TryCollect(Collider other)
+    {
+        if (!_ready || !_hasLanded || _collected || other.gameObject.layer != LayerMask.NameToLayer("Player")) return;
+        if (Time.time < _pickupAllowedAt) return;
+        if (_itemType != eITEMTYPE.MONEY && _itemType != eITEMTYPE.CONSUMABLE &&
+            _itemType != eITEMTYPE.EQUIPMENT && _itemType != eITEMTYPE.QUEST &&
+            _itemType != eITEMTYPE.INGREDIENT) return;
+
+        // Multiple player colliders must not award the same drop more than once.
+        _collected = true;
+        if (_itemType == eITEMTYPE.MONEY)
+        {
+            int money = _dropMoney > 0 ? Random.Range(_dropMoney, _dropMoney * 2) : _amount;
+            Managers.Player.AddMoney(money);
+        }
+        else
+        {
+            Managers.Inventory.TryAddItem(_itemType, _itemID, _amount);
+        }
+        _ready = false;
+        Managers.Resource.Destroy(gameObject);
     }
 }

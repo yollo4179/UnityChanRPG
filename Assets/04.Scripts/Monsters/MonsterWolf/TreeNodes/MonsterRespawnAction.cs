@@ -96,7 +96,7 @@ public partial class MonsterRespawnAction : Action
         
         foreach (Collider c in _col)
         {
-            if (0<(c.includeLayers.value & LayerMask.GetMask("Enemies")))
+            if ((LayerMask.GetMask("Enemies") & (1 << c.gameObject.layer)) != 0)
                 c.enabled =true;
         }
 

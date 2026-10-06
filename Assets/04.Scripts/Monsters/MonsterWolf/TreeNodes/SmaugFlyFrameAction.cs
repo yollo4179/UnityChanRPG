@@ -37,6 +37,7 @@ public partial class SmaugFlyFrameAction : Action
     int attackHashes;
 
     Coroutine _co;
+    float _skillStartTime;
     SkillSO _nowSkillSO;
     MonsterController _controller;
     MonsterAttackPrerequisiteChecker _attackPrerequisiteChecker;
@@ -86,6 +87,7 @@ public partial class SmaugFlyFrameAction : Action
 
 
 
+        _skillStartTime = Time.time;
         if (true ==hasInitialized) return Status.Running;
         hasInitialized = true;
         attackHashes = Animator.StringToHash("Base Layer.BattleLocomotion");
@@ -118,7 +120,15 @@ public partial class SmaugFlyFrameAction : Action
             return Status.Success;
         }
 
-        if (null==_co&&false ==_animationDone)
+        if (Time.time - _skillStartTime > 12f)
+        {
+            Debug.LogWarning("Smaug aerial skill timed out; proceeding to landing", _self.Value);
+            if (_co != null) CoroutineRunner.Instance.StopCoroutine(_co);
+            _co = null;
+            _animationDone = true;
+            _animator.CrossFade("Base Layer.FlyLocomotion.Fly Float", 0.15f);
+        }
+        else if (_co == null && !_animationDone)
         {
             _co = CoroutineRunner.Instance.StartCoroutine(ActivateAnimationEvents());
         }
@@ -133,6 +143,17 @@ public partial class SmaugFlyFrameAction : Action
     }
     protected override void OnEnd()
     {
+        if (_co != null) CoroutineRunner.Instance.StopCoroutine(_co);
+        _co = null;
+        _isOnSkill.Value = false;
+        if (_handleCollider != null)
+        {
+            HitBox hitBox = _handleCollider.GetComponent<HitBox>();
+            hitBox.ResetSkillInfo();
+            hitBox.GetComponent<Collider>().enabled = false;
+            Managers.Pool.GetBack(_handleCollider);
+            _handleCollider = null;
+        }
         _status.GotHit = false;
         _attackPrerequisiteChecker.ClearAttackCoolTime();
         switch (_enemyState.Value)
@@ -149,10 +170,13 @@ public partial class SmaugFlyFrameAction : Action
 
             default:
                 {
+                    if (_effectHandle != null)
+                        Managers.Pool.GetBack(_effectHandle);
                     _enemyState.Value = eEnemyState.CHASE;
                     break;
                 }
         }
+        _effectHandle = null;
 
 
 
@@ -184,6 +208,7 @@ public partial class SmaugFlyFrameAction : Action
 
         Vector3 toTarget = VectorUtil.PlatVector(_target.transform.position - _self.Value.transform.position);
         //_nowLookDir = Vector3.RotateTowards(_nowLookDir, toTarget, Time.deltaTime*3f, Time.deltaTime*5f);
+        if (toTarget.sqrMagnitude < 0.001f) return;
         Quaternion targetRotation = Quaternion.LookRotation(toTarget);
         _self.Value.transform.rotation = Quaternion.Slerp(_self.Value.transform.rotation, targetRotation, Time.deltaTime* 10f);
 
@@ -216,18 +241,6 @@ public partial class SmaugFlyFrameAction : Action
                 _animator.SetTrigger("OnSkill");
                 _animator.SetInteger("SkillNO", _customSkillNo.Value);
             }
-            #region 디버그
-            //디버그 
-            if (_animator.IsInTransition(0))
-            {
-                Debug.LogFormat($"<color=#00ff00>NowTransition :norTime :{_animator.GetCurrentAnimatorStateInfo(0).normalizedTime}</color>");
-
-            }
-            else
-            {
-                Debug.LogFormat($"<color=#ffff00>Before Transition :norTime :{_animator.GetCurrentAnimatorStateInfo(0).normalizedTime}</color>");
-            }
-            #endregion
             yield return null;
         }
 
@@ -345,10 +358,14 @@ public partial class SmaugFlyFrameAction : Action
                     }
                     else
                     {
-                        HitBox hitBox = _handleCollider.GetComponent<HitBox>();
-                        hitBox.ResetSkillInfo();
-                        hitBox.GetComponent<Collider>().enabled = false;
-                        Managers.Pool.GetBack(_handleCollider);
+                        if (_handleCollider != null)
+                        {
+                            HitBox hitBox = _handleCollider.GetComponent<HitBox>();
+                            hitBox.ResetSkillInfo();
+                            hitBox.GetComponent<Collider>().enabled = false;
+                            Managers.Pool.GetBack(_handleCollider);
+                            _handleCollider = null;
+                        }
                     }
                     break;
                 }

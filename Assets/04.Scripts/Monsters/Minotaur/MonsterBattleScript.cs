@@ -53,12 +53,7 @@ public class MonsterBattleScript : MonoBehaviour
     }
     eStrafeDirection _strafeDir = eStrafeDirection.strafe_Left ; 
 
-    eNowState _fromState;
-    eNowState _toState;
     protected eNowState _nowState;
-    private float _blendStartTime = 0f;
-    bool _isBlending = false;
-    float _lerpTime = 0.2f;
     public virtual void Awake()
     {
         _debugLines = new DebugSet[_numRays];
@@ -98,94 +93,48 @@ public class MonsterBattleScript : MonoBehaviour
 
         _attackChecker.CheckAttackCondition();
     }
-    public Vector3 CalculateInterests(float lengthToTargetOnXZ, Vector3 toTarget,bool isFirst = true)
+    public Vector3 CalculateInterests(float lengthToTargetOnXZ, Vector3 toTarget, bool isFirst = true)
     {
+        // Select one movement state for the entire context map. Updating it inside
+        // the ray loop left some directions using weights from the previous state.
+        _nowState = lengthToTargetOnXZ < _rangeOffset ? eNowState.MoveB
+            : lengthToTargetOnXZ <= _rangeOffset + 2f ? eNowState.Strafe
+            : eNowState.MoveF;
+        if (isFirst) _nowLookDir = transform.forward;
 
         Vector3 interestSum = Vector3.zero;
-
-
-        for (int i = 0; i< _numRays; i++)
+        for (int i = 0; i < _numRays; i++)
         {
-
-            Vector3 axis = transform.forward.normalized;
-            axis = Quaternion.Euler(0, i * 360f/_numRays, 0)* axis;
-            axis=axis.normalized;
-
-            Ray ray = new Ray();
-            ray.origin = transform.position +_offset;
-            ray.direction = axis;
-
+            Vector3 axis = Quaternion.Euler(0, i * 360f / _numRays, 0) * transform.forward;
             float dotProduct = Vector3.Dot(toTarget, axis);
-
-            if (isFirst)
-            {
-                _nowState= _toState =_fromState;
-                _blendStartTime = 0f;
-                _isBlending =false;
-            }            
-            
-            if (_isBlending)
-            {
-                _blendStartTime = Mathf.Lerp(_blendStartTime, _lerpTime, Time.deltaTime);
-
-                if (Mathf.Abs(_lerpTime-_blendStartTime)<0.01f)
-                {
-                    _blendStartTime = 0f;
-                    _isBlending =false;
-                    _nowState = _toState;
-                }
-            }
-            else {
-                if (lengthToTargetOnXZ<_rangeOffset)
-                {
-                    _animatorVal_V = -1;
-
-                    _interestMap[i]= 0.5f*(1-dotProduct); //µÚ·Î 
-                    _toState = eNowState.MoveB;
-                }
-                else if (_rangeOffset  <= lengthToTargetOnXZ  &&lengthToTargetOnXZ<=_rangeOffset+2f)
-                {
-                    _interestMap[i] = 2*(1 - Mathf.Abs(dotProduct));//¹ð±Û
-                    _toState = eNowState.Strafe;
-                }
-                else
-                {
-                    _interestMap[i] =  0.5f*(dotProduct+1f); //¦i
-                    _toState = eNowState.MoveF;
-                }
-                if (_fromState !=_toState)
-                {
-                    _isBlending  = true;
-
-                }
-                _fromState = _toState;
-            }
-
+            float interest = _nowState == eNowState.MoveB ? 0.5f * (1f - dotProduct)
+                : _nowState == eNowState.Strafe ? 2f * (1f - Mathf.Abs(dotProduct))
+                : 0.5f * (1f + dotProduct);
+            Ray ray = new Ray(transform.position + _offset, axis);
             _dangerMap[i] = 0f;
-            if (Physics.Raycast(ray, out RaycastHit hit, _lengthRay, _obstacleMask, QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(ray, out RaycastHit hit, _lengthRay, _obstacleMask,
+                QueryTriggerInteraction.Ignore) && !hit.transform.IsChildOf(transform))
             {
-                _interestMap[i] = (hit.distance-_capsuleR)/(_lengthRay-_capsuleR);
-                _dangerMap[i]=1f;
+                // Obstacles may reduce interest, never introduce attraction.
+                float safety = Mathf.Clamp01((hit.distance - _capsuleR)
+                    / Mathf.Max(0.001f, _lengthRay - _capsuleR));
+                interest *= safety;
+                _dangerMap[i] = 1f - safety;
             }
-
-            ray.direction =_interestMap[i]*axis;
-            _debugLines[i].ray = ray;
-            _debugLines[i].isInterested =(0>=_dangerMap[i] );
-            _interestMap[i] =(0<_interestMap[i]) ? _interestMap[i] : 0f;
-
-
-            interestSum += _interestMap[i] *axis;
+            _interestMap[i] = Mathf.Max(0f, interest);
+            _debugLines[i].ray = new Ray(ray.origin, _interestMap[i] * axis);
+            _debugLines[i].isInterested = _dangerMap[i] <= 0f;
+            interestSum += _interestMap[i] * axis;
         }
-        _monsterSpeed =_baseSpeed;
+        _monsterSpeed = _baseSpeed;
         if (_nowState == eNowState.Strafe)
         {
-            interestSum = Strafe(toTarget).normalized;
-            _monsterSpeed =_baseSpeed*0.3f;
+            interestSum = Strafe(toTarget);
+            _monsterSpeed *= 0.3f;
         }
-        if (_nowState == eNowState.MoveB)
+        else if (_nowState == eNowState.MoveB)
         {
-
-            _monsterSpeed =_baseSpeed*0.5f;
+            _monsterSpeed *= 0.5f;
         }
         return interestSum.normalized;
     }

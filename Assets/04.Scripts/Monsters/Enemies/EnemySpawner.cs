@@ -23,6 +23,7 @@ public class EnemySpawner : MonoBehaviour
     /*Debug*/
     [SerializeField] TextMeshPro _idxTextInstancePrefab;
     [Header("Monster Description")]
+    [SerializeField, Min(1)] private int _spawnCount = 2;
     [SerializeField] MonsterDesc _monsterDesc;
 
     Dictionary<int, SpawnTile> _dicSpawnCells=new();
@@ -67,7 +68,7 @@ public class EnemySpawner : MonoBehaviour
         int numIdx = maxNumRowCell *maxNumColCell;
 
         SpawnTile nowTile = null;
-        int Cnt = 2; 
+        int Cnt = Mathf.Max(1, _spawnCount);
         for (int i = 0; i<numIdx; ++i)
         {
             if(null==nowTile)

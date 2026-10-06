@@ -29,7 +29,6 @@ public partial class SmaugBattleAction : Action
         _battleScript = _self.Value.GetComponent<MonsterBattleScript>();
 
         _animator  = _self.Value.GetComponentInChildren<Animator>();
-        _animator.SetTrigger("OnBattle");
         _agent  = _self.Value.GetComponent<NavMeshAgent>();
         _agent.enabled = false;
         _status = _self.Value.GetComponent<StatusScript>();

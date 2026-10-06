@@ -107,10 +107,10 @@ namespace TinyScript {
             for (int i = 0; i < GuaranteedDropList.Count; i++)
             {
                 // SpawnPosition
-                //Vector3 SpawnPosition = new Vector3(Spawnpoint.localPosition.x + GenerateRandomNumber(MinRange, MaxRange), Spawnpoint.localPosition.y + GenerateRandomNumber(MinRange, MaxRange), Spawnpoint.localPosition.z + GenerateRandomNumber(MinRange, MaxRange));
+                //Vector3 SpawnPosition = new Vector3(Spawnpoint.position.x + GenerateRandomNumber(MinRange, MaxRange), Spawnpoint.position.y + GenerateRandomNumber(MinRange, MaxRange), Spawnpoint.position.z + GenerateRandomNumber(MinRange, MaxRange));
                 Vector3 SpawnPosition = GenerateRandomNumber(MinRange, MaxRange);
-                SpawnPosition = new Vector3(SpawnPosition.x + Spawnpoint.localPosition.x, SpawnPosition.y + Spawnpoint.localPosition.y, SpawnPosition.z + Spawnpoint.localPosition.z);
-                if (SpawnYEqualTo0) { SpawnPosition.y = Spawnpoint.localPosition.y; }
+                SpawnPosition = new Vector3(SpawnPosition.x + Spawnpoint.position.x, SpawnPosition.y + Spawnpoint.position.y, SpawnPosition.z + Spawnpoint.position.z);
+                if (SpawnYEqualTo0) { SpawnPosition.y = Spawnpoint.position.y; }
 
                 // Spawn
                 //Instantiate(GuaranteedDropList[i], SpawnPosition, Quaternion.identity);
@@ -123,10 +123,10 @@ namespace TinyScript {
             for (int i = 0; i < AdditionalDropList.Count; i++)
             {
                 // SpawnPosition
-                //Vector3 SpawnPosition = new Vector3(Spawnpoint.localPosition.x + GenerateRandomNumber(MinRange, MaxRange), Spawnpoint.localPosition.y + GenerateRandomNumber(MinRange, MaxRange), Spawnpoint.localPosition.z + GenerateRandomNumber(MinRange, MaxRange));
+                //Vector3 SpawnPosition = new Vector3(Spawnpoint.position.x + GenerateRandomNumber(MinRange, MaxRange), Spawnpoint.position.y + GenerateRandomNumber(MinRange, MaxRange), Spawnpoint.position.z + GenerateRandomNumber(MinRange, MaxRange));
                 Vector3 SpawnPosition = GenerateRandomNumber(MinRange, MaxRange);
-                SpawnPosition = new Vector3(SpawnPosition.x + Spawnpoint.localPosition.x, SpawnPosition.y + Spawnpoint.localPosition.y, SpawnPosition.z + Spawnpoint.localPosition.z);
-                if (SpawnYEqualTo0) { SpawnPosition.y = Spawnpoint.localPosition.y; }
+                SpawnPosition = new Vector3(SpawnPosition.x + Spawnpoint.position.x, SpawnPosition.y + Spawnpoint.position.y, SpawnPosition.z + Spawnpoint.position.z);
+                if (SpawnYEqualTo0) { SpawnPosition.y = Spawnpoint.position.y; }
 
                 // Spawn
                 Poolable poolable = Managers.Pool.LendPoolableTo(AdditionalDropList[i].name, null);

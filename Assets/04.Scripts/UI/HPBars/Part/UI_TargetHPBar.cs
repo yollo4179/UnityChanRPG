@@ -2,53 +2,75 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Slider))]
 public class UI_TargetHPBar : MonoBehaviour
 {
-    Slider _slider;
-    float _targetRatio=1;
-    float _nowRatio = 1;
-    Coroutine _co = null; 
-    public  bool IsCoroutineOn { get { return _co != null; } }
-    public void Start()
+    private Slider _slider;
+    private float _targetRatio = 1f;
+    private float _nowRatio = 1f;
+    private Coroutine _co;
+    public bool IsCoroutineOn => _co != null;
+
+    private void Awake()
     {
         _slider = GetComponent<Slider>();
     }
-    IEnumerator DecreaseSlowly(float speed)
+
+    private IEnumerator DecreaseSlowly(float speed)
     {
-        while (true)
+        while (Mathf.Abs(_nowRatio - _targetRatio) > 0.001f)
         {
-            _nowRatio = Mathf.Clamp01(Mathf.MoveTowards(_nowRatio, _targetRatio, speed * Time.deltaTime));
+            _nowRatio = Mathf.MoveTowards(_nowRatio, _targetRatio, speed * Time.deltaTime);
             _slider.value = _nowRatio;
-            if (Mathf.Abs(_nowRatio- _targetRatio)<0.01f)
-            {
-                _co = null;
-                yield break;
-            }
-            yield return null; 
+            yield return null;
         }
+        _nowRatio = _targetRatio;
+        _slider.value = _nowRatio;
+        _co = null;
     }
+
     public void LoadSlider(StatusScript targetStatus)
     {
-        float fullHp = targetStatus.MaxHealth;
-        float nowHp = targetStatus.CurHealth;
-        _slider.value = nowHp / fullHp;
+        if (_slider == null) _slider = GetComponent<Slider>();
+        StopAnimation();
+        _targetRatio = HealthRatio(targetStatus);
+        _nowRatio = _targetRatio;
+        _slider.value = _nowRatio;
     }
-    public void UpdateSlider(StatusScript targetStatus,float speed =3f)
-  {
 
-        if (null ==_slider) return;
-        float fullHp = targetStatus.MaxHealth;
-        float nowHp = targetStatus.CurHealth;
+    public void UpdateSlider(StatusScript targetStatus, float speed = 3f)
+    {
+        _targetRatio = HealthRatio(targetStatus);
+        StopAnimation();
+        if (!isActiveAndEnabled || speed <= 0f)
+        {
+            _nowRatio = _targetRatio;
+            if (_slider != null) _slider.value = _nowRatio;
+            return;
+        }
+        if (Mathf.Abs(_targetRatio - _nowRatio) <= 0.001f)
+        {
+            _nowRatio = _targetRatio;
+            _slider.value = _nowRatio;
+            return;
+        }
+        _co = StartCoroutine(DecreaseSlowly(speed));
+    }
 
-        if (0 == fullHp) return; 
+    private static float HealthRatio(StatusScript status)
+    {
+        return status != null && status.MaxHealth > 0f
+            ? Mathf.Clamp01((float)status.CurHealth / status.MaxHealth) : 0f;
+    }
 
-         _targetRatio = nowHp / fullHp;
+    private void StopAnimation()
+    {
+        if (_co != null) StopCoroutine(_co);
+        _co = null;
+    }
 
-        if (Mathf.Abs(_targetRatio - _nowRatio)<0.001f) return;
-
-            if (null != _co)
-            StopCoroutine(_co);
-       CoroutineRunner.Instance.StartCoroutine(DecreaseSlowly(speed));
-
-  }
+    private void OnDisable()
+    {
+        StopAnimation();
+    }
 }

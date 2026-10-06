@@ -26,6 +26,8 @@ public partial class MonsterSkillAction : Action
     [SerializeReference] public BlackboardVariable<bool> _setSpecificSkillSOHandleOption;
     [SerializeReference] public BlackboardVariable<int> _specificHandleIndexFromController;
     int _originSkillNo;
+    int _animationSkillNo;
+    float _skillStartTime;
 
     public int[] _animationHashKeys;
     int _numSkills;
@@ -52,53 +54,46 @@ public partial class MonsterSkillAction : Action
 
     protected override Status OnStart()
     {
+        if (_attackPrerequisiteChecker == null) _attackPrerequisiteChecker = _self.Value.GetComponent<MonsterAttackPrerequisiteChecker>();
+        if (_controller == null) _controller = _self.Value.GetComponent<MonsterController>();
+        if (_animator == null) _animator = _self.Value.GetComponentInChildren<Animator>();
+        if (_status == null) _status = _self.Value.GetComponent<StatusScript>();
 
-
-        _isOnSkill.Value = true;
-        if (null==_attackPrerequisiteChecker) _attackPrerequisiteChecker =_self.Value.GetComponent<MonsterAttackPrerequisiteChecker>();
-        if (null==_controller) _controller = _self.Value.GetComponent<MonsterController>();
-        if (null==_animator) _animator = _self.Value.GetComponentInChildren<Animator>();
-        if (null==_status) _status = _self.Value.GetComponent<StatusScript>();
-
-          _animator.SetTrigger("OnSkill");
-        _animator.SetInteger("SkillNO", _skillNo.Value);
-        
-        
-        _originSkillNo=_skillNo.Value;
-        if (true ==_setSpecificSkillSOHandleOption)
+        if (!hasInitialized)
         {
-                _skillNo.Value = _specificHandleIndexFromController;
-                _nowSkillSO = _controller.GetSkillSOByHandle(_specificHandleIndexFromController);
-                 Debug.Assert(_nowSkillSO != null);
+            _animationHashKeys = _strAnimationHashList.Value.Select(Animator.StringToHash).ToArray();
+            _numSkills = _animationHashKeys.Length;
+            hasInitialized = true;
         }
-        else
+
+        _animationSkillNo = _skillNo.Value;
+        _originSkillNo = _animationSkillNo;
+        if (_animationSkillNo < 0 || _animationSkillNo >= _numSkills)
         {
-                _nowSkillSO = _controller.GetSkillSOByHandle(_skillNo.Value); //0~2
+            Debug.LogError($"Invalid animation skill index: {_animationSkillNo}", _self.Value);
+            return Status.Failure;
         }
-        
+
+        int dataHandle = _setSpecificSkillSOHandleOption.Value
+            ? _specificHandleIndexFromController.Value : _animationSkillNo;
+        _nowSkillSO = _controller.GetSkillSOByHandle(dataHandle);
+        if (_controller is SmaugController smaug && !_setSpecificSkillSOHandleOption.Value)
+        {
+            float healthRatio = _status.MaxHealth > 0f ? _status.CurHealth / _status.MaxHealth : 1f;
+            _nowSkillSO = smaug.GetSkillForAnimation(_animationSkillNo, healthRatio);
+        }
+        if (_nowSkillSO == null)
+        {
+            Debug.LogError($"Missing monster skill data: {dataHandle}", _self.Value);
+            return Status.Failure;
+        }
+
         _animationDone = false;
-        _co =null;
-
-
-
-
-        if (true ==hasInitialized) return Status.Running;
-        hasInitialized = true;
-       
-        attackHashes = Animator.StringToHash("Base Layer.BattleLocomotion");
-        _animationHashKeys = _strAnimationHashList.Value
-            .Select(Animator.StringToHash)
-            .ToArray();
-        _numSkills = _animationHashKeys.Length;
-
-        
+        _co = null;
+        _skillStartTime = Time.time;
         _isOnSkill.Value = true;
+        _animator.SetInteger("SkillNO", _animationSkillNo);
         _animator.SetTrigger("OnSkill");
-        _animator.SetInteger("SkillNO", _skillNo.Value);
-        _nowSkillSO = _controller.GetSkillSOByHandle(_skillNo.Value); //0~2
-        _animationDone = false;
-        _co =null;
-
         return Status.Running;
     }
 
@@ -118,7 +113,15 @@ public partial class MonsterSkillAction : Action
             return Status.Success;
         }
 
-        if (null==_co&&false ==_animationDone)
+        if (_controller is SmaugController && Time.time - _skillStartTime > 12f)
+        {
+            Debug.LogWarning("Smaug skill timed out; returning to chase", _self.Value);
+            if (_co != null) CoroutineRunner.Instance.StopCoroutine(_co);
+            _co = null;
+            _animationDone = true;
+            _animator.CrossFade("Base Layer.BattleLocomotion", 0.15f);
+        }
+        else if (_co == null && !_animationDone)
         {
             _co = CoroutineRunner.Instance.StartCoroutine(ActivateAnimationEvents());
         }
@@ -134,12 +137,20 @@ public partial class MonsterSkillAction : Action
     protected override void OnEnd()
     {
 
-        ++_skillNo.Value;
-        _skillNo.Value%=_numSkills;
-        if(true ==_setSpecificSkillSOHandleOption)
+        if (_co != null) CoroutineRunner.Instance.StopCoroutine(_co);
+        _co = null;
+        _isOnSkill.Value = false;
+        if (_handleCollider != null)
         {
-            _skillNo.Value = _originSkillNo; 
+            HitBox hitBox = _handleCollider.GetComponent<HitBox>();
+            hitBox.ResetSkillInfo();
+            hitBox.GetComponent<Collider>().enabled = false;
+            Managers.Pool.GetBack(_handleCollider);
+            _handleCollider = null;
         }
+        if (_numSkills > 0)
+            _skillNo.Value = _setSpecificSkillSOHandleOption.Value
+                ? _originSkillNo : (_originSkillNo + 1) % _numSkills;
 
         _status.GotHit = false;
         _attackPrerequisiteChecker.ClearAttackCoolTime();
@@ -157,10 +168,13 @@ public partial class MonsterSkillAction : Action
 
             default:
                 {
+                    if (_effectHandle != null)
+                        Managers.Pool.GetBack(_effectHandle);
                     _enemyState.Value = eEnemyState.CHASE;
                     break;
                 }
         }
+        _effectHandle = null;
 
 
 
@@ -179,7 +193,7 @@ public partial class MonsterSkillAction : Action
             }
             else
             {
-                if (_animator.GetCurrentAnimatorStateInfo(0).fullPathHash == _animationHashKeys[_skillNo.Value])
+                if (_animator.GetCurrentAnimatorStateInfo(0).fullPathHash == _animationHashKeys[_animationSkillNo])
                     _animationDone=true;
             }
         }
@@ -192,6 +206,7 @@ public partial class MonsterSkillAction : Action
 
         Vector3 toTarget = VectorUtil.PlatVector(_target.transform.position - _self.Value.transform.position);
         //_nowLookDir = Vector3.RotateTowards(_nowLookDir, toTarget, Time.deltaTime*3f, Time.deltaTime*5f);
+        if (toTarget.sqrMagnitude < 0.001f) return;
         Quaternion targetRotation = Quaternion.LookRotation(toTarget);
         _self.Value.transform.rotation = Quaternion.Slerp(_self.Value.transform.rotation, targetRotation, Time.deltaTime* 10f);
 
@@ -209,32 +224,20 @@ public partial class MonsterSkillAction : Action
 
 
         //이전 애니메이션으로 보간중이라면 기다린다.
-        while ((_animator.GetCurrentAnimatorStateInfo(0).fullPathHash) != _animationHashKeys[_skillNo.Value])
+        while ((_animator.GetCurrentAnimatorStateInfo(0).fullPathHash) != _animationHashKeys[_animationSkillNo])
         {
             /*if(true == turnDuringSkill) */TurnToPlayer();
 
             //현재 애니메이션에 도달하지 않았다 // 전이 상태가 아니다. //전이를 위해서 트리거를 건다.
             if (
                 _animator.IsInTransition(0)&&
-                _animator.GetNextAnimatorStateInfo(0).fullPathHash !=_animationHashKeys[_skillNo.Value]
+                _animator.GetNextAnimatorStateInfo(0).fullPathHash !=_animationHashKeys[_animationSkillNo]
 
                 )
             {
                 _animator.SetTrigger("OnSkill");
-                _animator.SetInteger("SkillNO", _skillNo.Value);
+                _animator.SetInteger("SkillNO", _animationSkillNo);
             }
-            #region 디버그
-            //디버그 
-            if (_animator.IsInTransition(0))
-            {
-                Debug.LogFormat($"<color=#00ff00>NowTransition :norTime :{_animator.GetCurrentAnimatorStateInfo(0).normalizedTime}</color>");
-
-            }
-            else
-            {
-                Debug.LogFormat($"<color=#ffff00>Before Transition :norTime :{_animator.GetCurrentAnimatorStateInfo(0).normalizedTime}</color>");
-            }
-            #endregion
             yield return null;
         }
 
@@ -247,7 +250,7 @@ public partial class MonsterSkillAction : Action
         try
         {
             //현재 공격 애니메이션이 진행중이라면 풀패스와 지금 코드를 비교한다.
-            while (_animator.GetCurrentAnimatorStateInfo(0).fullPathHash == _animationHashKeys[_skillNo.Value])
+            while (_animator.GetCurrentAnimatorStateInfo(0).fullPathHash == _animationHashKeys[_animationSkillNo])
             {
                 if (true == _bTurnDuringSkill) TurnToPlayer();
 
@@ -352,10 +355,14 @@ public partial class MonsterSkillAction : Action
                     }
                     else
                     {
-                        HitBox hitBox = _handleCollider.GetComponent<HitBox>();
-                        hitBox.ResetSkillInfo();
-                        hitBox.GetComponent<Collider>().enabled = false;
-                        Managers.Pool.GetBack(_handleCollider);
+                        if (_handleCollider != null)
+                        {
+                            HitBox hitBox = _handleCollider.GetComponent<HitBox>();
+                            hitBox.ResetSkillInfo();
+                            hitBox.GetComponent<Collider>().enabled = false;
+                            Managers.Pool.GetBack(_handleCollider);
+                            _handleCollider = null;
+                        }
                     }
                     break;
                 }

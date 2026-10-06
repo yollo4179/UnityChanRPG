@@ -2411,7 +2411,7 @@ MonoBehaviour:
   _isBehaviorTreeOn: 1
   _stoppingDistance: 0.5
   _behaviorMode: 0
-  _ZoneID: 0
+  _ZoneID: 1000
 --- !u!114 &4038667153202677859
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2626,9 +2626,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cebd6d976c9b0aa42a07ef2958ea18d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _materialPhase: {fileID: 2100000, guid: db2c9315abf620743bd860621f842bcf, type: 2}
-  _materialOrigin: {fileID: 2100000, guid: 622dfe6cbe6bf144cb3d01ba0282c0e7, type: 2}
-  _materialDisolve: {fileID: 2100000, guid: 00f4ff5524567fa4d9f668a03ebb1e47, type: 2}
+  _materialPhase:
+  - {fileID: 2100000, guid: db2c9315abf620743bd860621f842bcf, type: 2}
+  _materialOrigin:
+  - {fileID: 2100000, guid: 622dfe6cbe6bf144cb3d01ba0282c0e7, type: 2}
+  _materialDisolve:
+  - {fileID: 2100000, guid: 00f4ff5524567fa4d9f668a03ebb1e47, type: 2}
 --- !u!114 &1304652773501399175
 MonoBehaviour:
   m_ObjectHideFlags: 0

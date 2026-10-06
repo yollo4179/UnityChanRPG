@@ -2763,7 +2763,7 @@ GameObject:
   - component: {fileID: 3013015790977976037}
   m_Layer: 0
   m_Name: Smaug
-  m_TagString: Untagged
+  m_TagString: Enemies
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2984,9 +2984,9 @@ MonoBehaviour:
   _lengthRay: 5
   _baseHeight: 1
   _capsuleR: 0.5
-  _rangeOffset: 3.84
+  _rangeOffset: 3.2
   _monsterSpeed: 4.74
-  _stoppingDuration: 4.5
+  _resumeChaseOffset: 0.4
 --- !u!114 &3009975425971840576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3090,7 +3090,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterType: 1
-  _characterID: 1003
+  _characterID: 1006
 --- !u!114 &2298779939742075768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3121,7 +3121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NowState:
     rid: -2
-  m_ID: 1003
+  m_ID: 1006
   _smaugSkillSet:
   - skillSO: {fileID: 11400000, guid: 7e85a897ec40fdf4890ce637a9d1b5a4, type: 2}
     eSmaugState: 0
@@ -3135,6 +3135,7 @@ MonoBehaviour:
   - skillSO: {fileID: 11400000, guid: a3aba5e04667a0d4b9012c3a3ae27161, type: 2}
     eSmaugState: 3
     isState: 0
+  _enragedHeadSkill: {fileID: 11400000, guid: f6e504b466a74b57a0bfc5909957599b, type: 2}
   references:
     version: 2
     RefIds:
