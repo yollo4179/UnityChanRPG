@@ -37,7 +37,7 @@ public class EventManager
         public void Dispose() 
         {
             if (null ==m_FuncHandle) return; 
-            Managers.Event.UnSubscribe<T>(m_FuncHandle);
+            Managers.EventIfExists?.UnSubscribe<T>(m_FuncHandle);
             m_FuncHandle = null; 
         }
     }
@@ -86,10 +86,9 @@ public class EventManager
     {
         var TypeOfEvent = typeof(T);
         m_EventHandlers.TryGetValue(TypeOfEvent, out var Del);
-        if (null ==Del) {
-            Debug.Log($"<color=#ff0000>{TypeOfEvent.Name}타입으로 등록된 이벤트가 없습니다.</color>"); 
-            return;
-        }
+        // Events without an active subscriber are expected (for example, area
+        // triggers before the corresponding visit-area quest is accepted).
+        if (Del == null) return;
         (Del as Action<T>)?.Invoke(Event); //이벤트를 발행한다.
         /*이벤트 내 구조체 정보는 함수에서 각자 판단해서 로직을 수행하자.*/
     }

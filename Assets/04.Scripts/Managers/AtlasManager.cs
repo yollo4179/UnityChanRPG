@@ -37,24 +37,22 @@ public class AtlasManager : MonoBehaviour
     {
         get
         {
-            if(null ==m_Instance)//싱글톤으로서 이미 존재하면 걍 반환
+            if (m_Instance == null)
+                m_Instance = UnityEngine.Object.FindAnyObjectByType<AtlasManager>();
+            if (m_Instance == null)
             {
-                m_Instance= UnityEngine.Object.FindFirstObjectByType<AtlasManager>();//활성화된 로드된 오브젝트가 같은타입으로 존재하는가? (싱글 톤 조건 )
-                m_Instance.Init();
+                GameObject prefab = Resources.Load<GameObject>("Prefabs/AtlasManager");
+                if (prefab == null)
+                    throw new InvalidOperationException("Missing Prefabs/AtlasManager resource.");
+                m_Instance = Instantiate(prefab).GetComponent<AtlasManager>();
             }
-            if(null ==m_Instance)
-            {//디버깅용 name 
-                var GO = new GameObject(nameof(AtlasManager));
-                m_Instance=GO.AddComponent<AtlasManager>();
-                m_Instance.Init();
-            }
+            m_Instance.Init();
             return m_Instance;
         }
-        
     }
 
+    private bool _initialized;
 
-    /*Atlas는 외부에 서 등록하겠다.*/
     [SerializeField]
     public AtlasEntry[] m_arrAtlassed;
     Dictionary<string, SpriteAtlas>[] m_DicSprite = new Dictionary<string, SpriteAtlas>[(int)eATLAS.ATLAS_END];
@@ -67,28 +65,40 @@ public class AtlasManager : MonoBehaviour
     }
     private void Awake()
     {
-       
+        if (m_Instance != null && m_Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        m_Instance = this;
+        transform.SetParent(null);
+        DontDestroyOnLoad(gameObject);
+        Init();
+    }
+
+    private void OnDestroy()
+    {
+        if (m_Instance == this) m_Instance = null;
     }
 
     private void Init()
     {
-        try
+        if (_initialized) return;
+        for (int i = 0; i < (int)eATLAS.ATLAS_END; i++)
+            m_DicSprite[i] = new Dictionary<string, SpriteAtlas>();
+
+        if (m_arrAtlassed != null)
         {
-            for (int i = 0; i<(int)eATLAS.ATLAS_END; ++i)
+            foreach (AtlasEntry atlas in m_arrAtlassed)
             {
-                this.m_DicSprite[i]=new Dictionary<string, SpriteAtlas>();
-            }
-            foreach (var Atlas in m_Instance.m_arrAtlassed)
-            {
-                this.m_DicSprite[(int)Atlas.key].Add(Atlas.value.name, Atlas.value);
+                int key = (int)atlas.key;
+                if (atlas.value == null || key < 0 || key >= m_DicSprite.Length) continue;
+                m_DicSprite[key][atlas.value.name] = atlas.value;
             }
         }
-        catch (System.Exception e)
-        {
-            Debug.LogException(e);
-        }
+        _initialized = true;
     }
-    /*주의 : 같은 그룹의 아틀라스에 같은 이름의 스프라이트가 중복되면 꼬입니다 +O(N).*/
+
     public SpriteAtlas GetAtlasByName(eATLAS ATLASTYPE, string AtlasName)
     {
         try

@@ -68,8 +68,10 @@ public class PoolingManager
     Dictionary<string, Pool> _pools = new Dictionary<string, Pool>();
     Transform _root;
     public void Init() {
+        if (_root != null) return;
         _root  =new GameObject("{Pool_Root}").transform; //최상위 부모 노드
         Object.DontDestroyOnLoad(_root.gameObject);
+        GameplayResourceBootstrap.RegisterPools(this);
     }
     public void GetBack(Poolable poolable)
     {
@@ -95,6 +97,8 @@ public class PoolingManager
     }
     public void CreatePool(GameObject original,bool worldPosStays=true, int count=5)
     {
+        if (original == null) throw new System.ArgumentNullException(nameof(original));
+        if (_pools.ContainsKey(original.name)) return;
         Pool pool = new Pool();
         pool._worldPosStays= worldPosStays;
         pool.Init(original, count);

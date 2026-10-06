@@ -32,6 +32,9 @@ public class Managers : MonoBehaviour
     public static SceneManagerEx Scene { get { return Instance._scene; } }
 
     public static UIManager UI { get { return Instance._ui; } }
+    // Teardown callbacks must not use Instance, which creates manager roots on demand.
+    public static UIManager UIIfExists => _instance != null ? _instance._ui : null;
+    public static EventManager EventIfExists => _instance != null ? _instance._event : null;
 
     public static InventoryManager Inventory { get { return Instance._inventory; } }
     public static DataManager Data { get { return Instance._data; } }
