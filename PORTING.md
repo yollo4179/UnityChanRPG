@@ -25,7 +25,7 @@ git lfs fsck
 
 Unity Hub의 프로젝트 추가에서 저장소 루트를 지정한다. 최초 실행 시 패키지 다운로드와 에셋 임포트가 끝날 때까지 기다린다. 모델이나 텍스처 파일에 `version https://git-lfs.github.com/spec/v1`만 보이면 에셋이 아니라 LFS 포인터이므로 `git lfs pull`을 다시 실행한다.
 
-`Assets`, `Packages`, `ProjectSettings`와 모든 에셋의 `.meta` 파일이 필요하다. `Library`, `Temp`, `Logs`, `obj`, `UserSettings`, `.vs`는 재생성되는 로컬 파일이다. 복구용 `Assets/_Recovery`와 개인 저장 백업 `LocalBackups`는 배포 소스에 포함하지 않는다.
+`Assets`, `Packages`, `ProjectSettings`와 모든 에셋의 `.meta` 파일이 필요하다. `Library`, `Temp`, `Logs`, `obj`, `UserSettings`, `.vs`는 재생성되는 로컬 파일이다. `Assets/_Recovery`의 복구용 씬과 `LocalBackups`의 개인 저장 백업은 게임 실행에 필요하지 않다.
 
 ## 3. 에디터 실행
 
