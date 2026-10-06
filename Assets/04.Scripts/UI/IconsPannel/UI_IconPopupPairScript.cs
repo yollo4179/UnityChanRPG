@@ -1,89 +1,97 @@
-using NUnit.Framework;
-using System;
-using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UI_QuickSlot;
-using System.Collections.Generic;
+
 public class UI_IconPopupPairScript : UI_Scene
 {
-
-
-    public UI_Popup[] popUpHandle = new UI_Popup[(int)Buttons.END];
-   
     public enum Buttons
     {
-        Inven_Button=0,
-        Equip_Button=1,
-        Quest_Button=2,
-        Skill_Button=3,
-        Setting_Button=4,
+        Inven_Button = 0,
+        Equip_Button = 1,
+        Quest_Button = 2,
+        Skill_Button = 3,
+        Setting_Button = 4,
         END
     }
-    public void Awake()
+
+    private static readonly string[] PopupNames =
     {
-        
-        string[] pathNamePair = new string[(int)Buttons.END]
+        "InventoryPannel_Canvas_Prefab",
+        "UI_Equipment_Canvas_Prefab",
+        "Quest_Canvas_Prefab",
+        "SkillBook_Canvas_Prefab",
+        UI_SettingsPopup.PopupName
+    };
+
+    private static readonly KeyCode[] PopupKeys =
+    {
+        KeyCode.I,
+        KeyCode.E,
+        KeyCode.Q,
+        KeyCode.K,
+        KeyCode.Escape
+    };
+
+    public UI_Popup[] popUpHandle = new UI_Popup[(int)Buttons.END];
+
+    private void Awake()
+    {
+        Bind<Button>(typeof(Buttons));
+
+        for (int i = 0; i < PopupKeys.Length; i++)
         {
-            "InventoryPannel_Canvas_Prefab",
-            "UI_Equipment_Canvas_Prefab", //Equipment
-           "Quest_Canvas_Prefab", //Quest
-            "SkillBook_Canvas_Prefab",
-            null, //Setting
-        };
-
-        Bind<Button>(typeof(Buttons)); //Button을 Object에 담는다.
-
-        for(int i = 0; i < (int)Buttons.END; ++i)
-        {
-            if (null==pathNamePair[i]) continue;
-            int idx = i;
-            (_objects[typeof(Button)][i] as Button).onClick
-               .AddListener(() => {
-                   if (null == Managers.UI.GetOpenUIByName(pathNamePair[idx]))
-                   {
-                       popUpHandle[idx]= Managers.UI.ShowPopupUI<UI_Popup>(pathNamePair[idx]);
-                   }
-                   else
-                   {
-                       Managers.UI.ClosePopupUI(popUpHandle[idx]);
-                       popUpHandle[idx] =null;
-                   }
-
-               }
-               );
+            int index = i;
+            (_objects[typeof(Button)][index] as Button).onClick.AddListener(
+                () => TogglePopup(index));
         }
-            //(_objects[typeof(Button)][(int)Buttons.Inven_Button] as Button).onClick
-            //    .AddListener(() =>{
-            //        if (null==Managers.UI.GetUIByName("SkillBook_Canvas_Prefab"))
-            //        {
-            //            popUpHandle[(int)Buttons.Skill_Button]= Managers.UI.ShowPopupUI<UI_Popup>("PopUpUI/Inventory/InventoryPannel_Canvas_Prefab");
-            //        }
-            //        else
-            //        {
-            //            Managers.UI.ClosePopupUI(popUpHandle[(int)Buttons.Skill_Button]);
-            //            popUpHandle[(int)Buttons.Skill_Button] =null;
-            //        }
-                    
-            //    }
-            //    );
-
-            //(_objects[typeof(Button)][(int)Buttons.Skill_Button] as Button).onClick
-            //    .AddListener(() => {
-            //        if (null==Managers.UI.GetUIByName("SkillBook_Canvas_Prefab"))
-            //        {
-            //            popUpHandle[(int)Buttons.Skill_Button]= Managers.UI.ShowPopupUI<UI_Popup>("PopUpUI/Skills/SkillBook_Canvas_Prefab");
-            //        }
-            //        else
-            //        {
-            //            Managers.UI.ClosePopupUI(popUpHandle[(int)Buttons.Skill_Button]);
-            //            popUpHandle[(int)Buttons.Skill_Button] =null;
-            //        }
-            //    }
-            //    );
-        
-
     }
- 
+
+    private void Update()
+    {
+        GameObject settings = Managers.UI.GetOpenUIByName(UI_SettingsPopup.PopupName);
+        if (settings != null && settings.activeInHierarchy)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+                settings.GetComponent<UI_SettingsPopup>().Back();
+            return;
+        }
+
+        for (int i = 0; i < PopupKeys.Length; i++)
+        {
+            if (!Input.GetKeyDown(PopupKeys[i])) continue;
+            TogglePopup(i);
+            break;
+        }
+    }
+
+    private void TogglePopup(int index)
+    {
+        if (index != (int)Buttons.Setting_Button &&
+            Managers.UI.GetOpenUIByName(UI_SettingsPopup.PopupName) != null) return;
+
+        string popupName = PopupNames[index];
+        GameObject openPopup = Managers.UI.GetOpenUIByName(popupName);
+
+        if (openPopup != null)
+        {
+            UI_Popup popup = openPopup.GetComponent<UI_Popup>();
+            if (popup != null)
+                Managers.UI.ClosePopupUI(popup);
+            popUpHandle[index] = null;
+            return;
+        }
+
+        if (index == (int)Buttons.Setting_Button && Managers.Pool.GetOriginal(popupName) == null)
+        {
+            GameObject prefab = Managers.Resource.Load<GameObject>(
+                "Prefabs/UI/PopUpUI/" + UI_SettingsPopup.PopupName);
+            if (prefab == null)
+            {
+                Debug.LogError("Settings popup prefab is missing.");
+                return;
+            }
+            Managers.Pool.CreatePool(prefab, true, 1);
+        }
+
+        popUpHandle[index] = Managers.UI.ShowPopupUI<UI_Popup>(popupName);
+    }
 }

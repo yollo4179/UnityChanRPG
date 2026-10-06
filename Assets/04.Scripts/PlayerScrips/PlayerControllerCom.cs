@@ -1,5 +1,4 @@
 using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
@@ -75,6 +74,13 @@ public class PlayerControllerCom : IController
 
     private PlayerMovementCom m_PlayerMovementCom;
     private PlayerAnimatorCom m_PlayerAnimatorCom;
+    private bool _popupInputBlocked;
+    private bool _gameplayInputBlocked;
+
+    public bool UsesAnimationRootMotion =>
+        CurrentState is PlayerBaseAttackState ||
+        CurrentState is PlayerMeleeSkillState ||
+        CurrentState is PlayerRangedSkillState;
 
     
     private KeyCode[] m_KeyCode;
@@ -172,14 +178,56 @@ public class PlayerControllerCom : IController
     // Update is called once per frame
     public void Update()
     {
+        bool blockGameplay = Managers.UI.BlocksGameplayInput;
+        bool blockAttack = Managers.UI.BlocksAttackInput;
 
+        if (blockGameplay && !_gameplayInputBlocked)
+            CancelActiveAction(true);
+        else if (blockAttack && !_popupInputBlocked)
+            CancelActiveAction(false);
+
+        _gameplayInputBlocked = blockGameplay;
+        if (blockGameplay)
+        {
+            _popupInputBlocked = true;
+            m_PlayerMovementCom.resetMovementVector();
+            m_PlayerAnimatorCom.OnMovement(0f, 0f);
+            m_PlayerMovementCom.TickMovement();
+            return;
+        }
+
+        _popupInputBlocked = blockAttack;
         UpdateState();
-
-        //UpdateMovement();
-        // CheckJumpKey();
-        // CheckDashKey();
         UIKeyInput();
-        UpdateSlotInput();
+        if (!blockAttack) UpdateSlotInput();
+        m_PlayerMovementCom.TickMovement();
+    }
+
+    private void CancelActiveAction(bool includeDash)
+    {
+        bool cancelCombat = CurrentState is PlayerBaseAttackState ||
+            CurrentState is PlayerMeleeSkillState ||
+            CurrentState is PlayerRangedSkillState ||
+            CurrentState is PlayerBuffSkillState;
+        if (cancelCombat || (includeDash && CurrentState is PlayerDashState))
+        {
+            ChangeState((int)PLAYERSTATE.MOVEMENT);
+            Animator animator = m_PlayerAnimatorCom._Animator;
+            animator.ResetTrigger("OnBaseAttack");
+            animator.ResetTrigger("OnSkill");
+            animator.SetBool("InCombo", false);
+            animator.CrossFade("Base Layer.Movement", 0.05f);
+        }
+
+        // An attack may be interrupted during its active hit window.
+        foreach (HitBox hitBox in _hitBoxes)
+        {
+            if (hitBox == null) continue;
+            hitBox.ResetSkillInfo();
+            Collider hitCollider = hitBox.GetComponent<Collider>();
+            if (hitCollider != null) hitCollider.enabled = false;
+            hitBox.enabled = false;
+        }
     }
 
     public void UIKeyInput()

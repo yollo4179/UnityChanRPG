@@ -6,7 +6,7 @@ using System;
 #if UNITY_EDITOR
 using UnityEditor.Experimental.GraphView;
 #endif
-public class UI_Draggable_Move : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
+public class UI_Draggable_Move : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler, IPointerDownHandler
  {
     private Transform _originTransform;//내 원래 부모 
 
@@ -15,7 +15,9 @@ public class UI_Draggable_Move : MonoBehaviour, IBeginDragHandler, IEndDragHandl
     private RectTransform rect; //ui위치 제어를 위한 RectTransform 
     private CanvasGroup canvasGroup;//UI 알파 , 상호작용 제어 
 
-    private Vector2 _prePosition;
+    private RectTransform _dragPlane;
+    private Camera _dragCamera;
+    private Vector3 _pointerOffset;
 
     [SerializeField] bool _isPopupUI = false;
 
@@ -46,9 +48,18 @@ public class UI_Draggable_Move : MonoBehaviour, IBeginDragHandler, IEndDragHandl
     {
         PreviousTransform =_originTransform =originTransform;
     }
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+            Managers.UI.BringPopupToFront(GetComponentInParent<UI_Popup>());
+    }
     public void OnBeginDrag(PointerEventData eventData)
     {
-        canvas = Managers.UI.GetCachedUIByName("Draggable_Canvas").GetComponentInParent<Canvas>().transform;
+        Canvas dragCanvas = Managers.UI.GetCachedUIByName("Draggable_Canvas").GetComponentInParent<Canvas>();
+        canvas = dragCanvas.transform;
+        _dragPlane = canvas as RectTransform;
+        _dragCamera = dragCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : dragCanvas.worldCamera;
+        Managers.UI.SetDragging(this, true);
         
        
         transform.SetParent(canvas);
@@ -56,28 +67,31 @@ public class UI_Draggable_Move : MonoBehaviour, IBeginDragHandler, IEndDragHandl
 
         canvasGroup.alpha= 0.6F;
         canvasGroup.blocksRaycasts = false;
-        _prePosition = eventData.position;
+        _pointerOffset = Vector3.zero;
+        if (_isPopupUI && RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _dragPlane, eventData.pressPosition, _dragCamera, out Vector2 pressPoint))
+        {
+            _pointerOffset = rect.localPosition - (Vector3)pressPoint;
+        }
+        OnDrag(eventData);
     }
     public void OnDrag(PointerEventData eventData)
     {
-        if (true ==_isPopupUI)
+        if (_dragPlane != null && RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _dragPlane, eventData.position, _dragCamera, out Vector2 pointerPoint))
         {
-            rect.position +=  (Vector3)(eventData.position -_prePosition);
-            _prePosition =eventData.position;
-        }
-        else
-        {
-            rect.position = eventData.position;
+            rect.localPosition = (Vector3)pointerPoint + _pointerOffset;
         }
     }
     public void OnEndDrag(PointerEventData eventData)
     {
+        Managers.UI.SetDragging(this, false);
         if(true ==_isPopupUI)
         {
             transform.SetParent(_originTransform);
             canvasGroup.alpha = 1f;
             canvasGroup.blocksRaycasts =true;
-            transform.GetComponentInParent<UI_Popup>()?.showPopUp(); 
+            Managers.UI.BringPopupToFront(GetComponentInParent<UI_Popup>());
 
             return;
         }
@@ -100,6 +114,11 @@ public class UI_Draggable_Move : MonoBehaviour, IBeginDragHandler, IEndDragHandl
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts =true; 
     }
+    private void OnDisable()
+    {
+        Managers.UIIfExists?.SetDragging(this, false);
+    }
+
     public void GetBackToOrigin()
     {
         transform.SetParent(_originTransform);

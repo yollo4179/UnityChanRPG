@@ -61,6 +61,7 @@ public class SpringArmCom : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
+        if (Managers.UI.BlocksCameraInput) return;
 
         /*Default Logic*/
 
@@ -72,7 +73,7 @@ public class SpringArmCom : MonoBehaviour
         //Transform.position =Vector3.SmoothDamp(Transform.position, DesiredPosition, ref m_velocity, m_InterpTime);
 
         
-        if (Input.GetKeyDown(KeyCode.F1))
+        if (Input.GetKeyDown(KeyCode.Home))
         {
             m_Transform = m_OriginalTransform;
             m_fDistance= m_fOriginalDistance;

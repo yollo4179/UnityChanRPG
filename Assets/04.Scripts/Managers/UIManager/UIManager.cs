@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine.EventSystems;
 using System.IO;
 using System.Threading;
 using Unity.AppUI.UI;
@@ -19,6 +21,197 @@ public class UIManager
     int _zOrder =(int)UI_SortOrder.PopUpUIBase; //다음에 올 팝업에게 배정할 Count
 
     Stack<UI_Popup> _popupStack = new Stack<UI_Popup>();
+    private readonly HashSet<UI_Draggable_Move> _activeDrags = new HashSet<UI_Draggable_Move>();
+    private static readonly HashSet<string> NonModalPopupNames = new HashSet<string>(System.StringComparer.Ordinal)
+    {
+        "InventoryPannel_Canvas_Prefab",
+        "UI_Equipment_Canvas_Prefab",
+        "SkillBook_Canvas_Prefab",
+        "Quest_Canvas_Prefab"
+    };
+
+    private UI_Popup _focusedPopup;
+    private EventSystem _pointerEventSystem;
+    private PointerEventData _pointerEventData;
+    private readonly List<RaycastResult> _pointerHits = new List<RaycastResult>();
+    private int _lastPointerFrame = -1;
+    private bool _consumeLeftClickUntilRelease;
+    private bool _consumeGameplayInputUntilRelease;
+    private bool _clickedUIThisFrame;
+
+    public bool IsDragging => _activeDrags.Count > 0;
+    private bool IsFocusedPopupActive =>
+        _focusedPopup != null && _focusedPopup.gameObject.activeInHierarchy;
+
+    private bool HasModalPopup
+    {
+        get
+        {
+            foreach (UI_Popup popup in _popupStack)
+            {
+                if (popup != null && popup.gameObject.activeInHierarchy &&
+                    !NonModalPopupNames.Contains(popup.name)) return true;
+            }
+            return false;
+        }
+    }
+
+    private static bool IsTextInput(GameObject selected)
+    {
+        return selected != null &&
+            (selected.GetComponentInParent<TMP_InputField>() != null ||
+             selected.GetComponentInParent<UnityEngine.UI.InputField>() != null);
+    }
+
+    private static bool HasTextInputFocus()
+    {
+        EventSystem eventSystem = EventSystem.current;
+        return eventSystem != null && IsTextInput(eventSystem.currentSelectedGameObject);
+    }
+
+    // Resolve the left click once per frame so the camera and player use the same decision.
+    private void UpdateInputFocus()
+    {
+        if (_lastPointerFrame == Time.frameCount) return;
+        _lastPointerFrame = Time.frameCount;
+        _clickedUIThisFrame = false;
+
+        if (!Input.GetMouseButton(0))
+        {
+            _consumeLeftClickUntilRelease = false;
+            _consumeGameplayInputUntilRelease = false;
+        }
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        EventSystem eventSystem = EventSystem.current;
+        UI_Popup clickedPopup = null;
+        bool clickedUI = false;
+        if (eventSystem != null)
+        {
+            if (_pointerEventSystem != eventSystem)
+            {
+                _pointerEventSystem = eventSystem;
+                _pointerEventData = new PointerEventData(eventSystem);
+            }
+            _pointerEventData.Reset();
+            _pointerEventData.position = Input.mousePosition;
+            _pointerHits.Clear();
+            eventSystem.RaycastAll(_pointerEventData, _pointerHits);
+            foreach (RaycastResult hit in _pointerHits)
+            {
+                if (!(hit.module is UnityEngine.UI.GraphicRaycaster)) continue;
+                clickedUI = true;
+                clickedPopup = hit.gameObject.GetComponentInParent<UI_Popup>();
+                break;
+            }
+            _pointerHits.Clear();
+        }
+
+        if (clickedUI)
+        {
+            _clickedUIThisFrame = true;
+            _consumeLeftClickUntilRelease = true;
+            if (clickedPopup != null) BringPopupToFront(clickedPopup);
+            return;
+        }
+
+        if (HasModalPopup || IsDragging)
+        {
+            _consumeLeftClickUntilRelease = true;
+            return;
+        }
+
+        GameObject selected = eventSystem != null ? eventSystem.currentSelectedGameObject : null;
+        bool selectedButton = selected != null &&
+            selected.GetComponentInParent<UnityEngine.UI.Button>() != null;
+        bool selectedTextInput = IsTextInput(selected);
+        bool hadFocusedPopup = IsFocusedPopupActive;
+
+        if (selected != null) eventSystem.SetSelectedGameObject(null);
+        _focusedPopup = null;
+        if (selectedTextInput || (hadFocusedPopup && !selectedButton))
+        {
+            _consumeLeftClickUntilRelease = true;
+            _consumeGameplayInputUntilRelease = true;
+        }
+    }
+
+    public bool IsPointerOverUI
+    {
+        get
+        {
+            UpdateInputFocus();
+            if (Input.GetMouseButtonDown(0)) return _clickedUIThisFrame;
+            EventSystem eventSystem = EventSystem.current;
+            return eventSystem != null && eventSystem.IsPointerOverGameObject();
+        }
+    }
+
+    public bool HasFocusedPopup
+    {
+        get
+        {
+            UpdateInputFocus();
+            return HasModalPopup || IsFocusedPopupActive;
+        }
+    }
+
+    public bool BlocksGameplayInput
+    {
+        get
+        {
+            UpdateInputFocus();
+            return HasModalPopup || IsFocusedPopupActive || IsDragging ||
+                HasTextInputFocus() || _consumeGameplayInputUntilRelease;
+        }
+    }
+
+    public bool BlocksAttackInput
+    {
+        get
+        {
+            UpdateInputFocus();
+            return HasModalPopup || IsFocusedPopupActive || IsDragging ||
+                HasTextInputFocus() || _consumeLeftClickUntilRelease;
+        }
+    }
+
+    public bool BlocksCameraInput
+    {
+        get
+        {
+            UpdateInputFocus();
+            return HasModalPopup || IsFocusedPopupActive || IsDragging ||
+                HasTextInputFocus() || _consumeLeftClickUntilRelease;
+        }
+    }
+
+    public void BringPopupToFront(UI_Popup popup)
+    {
+        if (popup == null || !popup.gameObject.activeInHierarchy || !_popupStack.Contains(popup)) return;
+        _focusedPopup = popup;
+        if (_popupStack.Peek() == popup) return;
+
+        UI_Popup[] popups = _popupStack.ToArray();
+        _popupStack.Clear();
+        _zOrder = (int)UI_SortOrder.PopUpUIBase;
+        for (int i = popups.Length - 1; i >= 0; i--)
+        {
+            UI_Popup current = popups[i];
+            if (current == null || current == popup) continue;
+            current.GetComponent<UnityEngine.Canvas>().sortingOrder = _zOrder++;
+            _popupStack.Push(current);
+        }
+        popup.GetComponent<UnityEngine.Canvas>().sortingOrder = _zOrder++;
+        _popupStack.Push(popup);
+        popup.transform.SetAsLastSibling();
+    }
+    public void SetDragging(UI_Draggable_Move draggable, bool dragging)
+    {
+        if (draggable == null) return;
+        if (dragging) _activeDrags.Add(draggable);
+        else _activeDrags.Remove(draggable);
+    }
     UI_Scene _sceneUI ; // 고정 캔버스 UI (hud) 
 
     List<GameObject> _gameObjects= new List<GameObject>();
@@ -142,6 +335,7 @@ public class UIManager
         //위에 추가
 
         _openUIObjects.Add(go.name, go);
+        _focusedPopup = popup;
         _popupStack.Push(popup);// 스택이니까 가장 마지막에 연게 팝업
         go.transform.SetParent(Root.transform);// 루트에 등록) @root
         UnityEngine.Canvas canvas = UIUtil.GetOrAddComponent<UnityEngine.Canvas>(popup.gameObject);
@@ -203,6 +397,20 @@ public class UIManager
             ClosePopupUI(); //그냥 닫기
         }
         _openUIObjects.Remove(popup.name);
+        EventSystem eventSystem = EventSystem.current;
+        GameObject selected = eventSystem != null ? eventSystem.currentSelectedGameObject : null;
+        if (selected != null && selected.transform.IsChildOf(popup.transform))
+            eventSystem.SetSelectedGameObject(null);
+        if (_focusedPopup == popup)
+        {
+            _focusedPopup = null;
+            foreach (UI_Popup openPopup in _popupStack)
+            {
+                if (openPopup == null || !openPopup.gameObject.activeInHierarchy) continue;
+                _focusedPopup = openPopup;
+                break;
+            }
+        }
         
         return true;
     }
@@ -222,6 +430,11 @@ public class UIManager
     {
         while (_popupStack.Count > 0)
             ClosePopupUI();
+        _focusedPopup = null;
+        _consumeLeftClickUntilRelease = false;
+        _consumeGameplayInputUntilRelease = false;
+        EventSystem eventSystem = EventSystem.current;
+        if (eventSystem != null) eventSystem.SetSelectedGameObject(null);
     }
 }
 

@@ -6,7 +6,7 @@ public class CameraArmInterp : MonoBehaviour
     private float m_fCameraHitSpeed = 10f;
     private float m_Distance = 3f;
     private float m_CurDistance;
-    private float Sensitivity = 0.3f;
+    private float Sensitivity = 0.15f;
     private LayerMask collisionMask;  //마스크 연산?31비트? 64비트 다쓰나
     
 

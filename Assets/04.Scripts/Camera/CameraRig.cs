@@ -5,7 +5,7 @@ public class CameraRig : MonoBehaviour
     [SerializeField]
     private Transform m_TargetTransform;
     
-    private float m_DampTime = 0.12f;
+    private float m_DampTime = 0.2f;
     [SerializeField]
     private float m_PlayerSpeed;
     private Vector3 m_Velocity =Vector3.zero;
