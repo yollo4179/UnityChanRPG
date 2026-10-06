@@ -71,11 +71,17 @@ public abstract class PlayerState : IState
    protected    bool CheckSprintExitCondition() { return Input.GetKeyUp(m_PlayerController.GetKeyCode(eKEY_CODE.DASH));}
 
     /*기본 공격 조건입니다. */ 
-    protected    bool CheckAttack1Condition() { return Input.GetMouseButton(0);/*+ ui on Inven상태인지 체크*/ ; }
+    protected bool CheckAttack1Condition()
+    {
+        return !Managers.UI.BlocksAttackInput &&
+            !Managers.UI.IsPointerOverUI &&
+            Input.GetMouseButton(0);
+    }
 
     protected bool CheckSkillCondition(out int skillSlot)
     {
          skillSlot = 0;
+         if (Managers.UI.BlocksAttackInput) return false;
 
 
         if (Input.GetKeyDown(m_PlayerController.GetKeyCode(eKEY_CODE.SLOT1)))

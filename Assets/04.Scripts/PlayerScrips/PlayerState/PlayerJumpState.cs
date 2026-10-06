@@ -22,8 +22,8 @@ public class PlayerJumpState : PlayerState
 
     protected override sealed void UpdateMovement()
     {
-        m_X = Input.GetAxis("Horizontal");
-        m_Z = Input.GetAxis("Vertical");
+        m_X = Input.GetAxisRaw("Horizontal");
+        m_Z = Input.GetAxisRaw("Vertical");
         m_PlayerMovementCom.MoveTo(new Vector3(m_X, 0f, m_Z));
     }
 

@@ -8,7 +8,12 @@ public class PlayerMovementState : PlayerState
     float m_Z; 
     public override void Enter()
     {
-
+        m_X = Input.GetAxisRaw("Horizontal");
+        m_Z = Input.GetAxisRaw("Vertical");
+        Animator animator = m_PlayerAnimatorCom._Animator;
+        animator.SetFloat("Horizontal", m_X);
+        animator.SetFloat("Vertical", m_Z);
+        animator.SetFloat("Speed", Mathf.Clamp01(new Vector2(m_X, m_Z).sqrMagnitude));
     }
 
     public override void UpdateState()
@@ -24,8 +29,8 @@ public class PlayerMovementState : PlayerState
 
     protected override void UpdateMovement()
     {
-        m_X = Input.GetAxis("Horizontal");
-        m_Z = Input.GetAxis("Vertical");
+        m_X = Input.GetAxisRaw("Horizontal");
+        m_Z = Input.GetAxisRaw("Vertical");
         m_PlayerMovementCom.MoveTo(new Vector3(m_X, 0f, m_Z));
     }
 

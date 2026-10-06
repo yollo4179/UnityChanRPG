@@ -73,4 +73,5 @@ public class IController : MonoBehaviour
     protected List<IState> m_StateList;
     [SerializeReference]
     IState m_NowState;
+    protected IState CurrentState => m_NowState;
 }

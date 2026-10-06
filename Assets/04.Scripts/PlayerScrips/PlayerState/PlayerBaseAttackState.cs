@@ -84,7 +84,6 @@ public sealed class PlayerBaseAttackState : PlayerState
         _elapsedTime  = 0.0f;
 
         _lastClicked=false;
-        _animator.applyRootMotion =true;
 
         m_PlayerMovementCom.resetMovementVector();
         /*공격 바로 진입*/
@@ -102,10 +101,17 @@ public sealed class PlayerBaseAttackState : PlayerState
     }
     public override sealed void Exit()
     {
-        CoroutineRunner.Instance.StopCoroutine(ActivateAnimationEvents());
-
-
-        m_PlayerAnimatorCom._Animator.applyRootMotion =false;
+        if (_co != null)
+        {
+            CoroutineRunner.Instance.StopCoroutine(_co);
+            _co = null;
+        }
+        if (_effectHandle != null)
+        {
+            Managers.Pool.GetBack(_effectHandle);
+            _effectHandle = null;
+        }
+        m_PlayerAnimatorCom._Animator.SetBool("InCombo", false);
     }
     protected override sealed void UpdateAction()
     {
@@ -318,6 +324,7 @@ public sealed class PlayerBaseAttackState : PlayerState
 
     public void FireEvents(eAnimEvent eventName,bool isOn, AnimEventDesc eventDesc =default)
     {
+        if (isOn && Managers.UI.BlocksAttackInput) return;
        // Debug.Log(eventName);
         switch (eventName)
         {

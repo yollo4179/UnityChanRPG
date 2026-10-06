@@ -34,7 +34,6 @@ public class PlayerMeleeSkillState: PlayerState
 
         _animDone =false;
         
-        _animator.applyRootMotion =true;
         m_PlayerMovementCom.resetMovementVector();
         /*공격 바로 진입*/
         if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.9f)
@@ -54,10 +53,17 @@ public class PlayerMeleeSkillState: PlayerState
     }
     public override sealed void Exit()
     {
-        CoroutineRunner.Instance.StopCoroutine(ActivateAnimationEvents());
-
-
-        m_PlayerAnimatorCom._Animator.applyRootMotion =false;
+        if (_animator != null) _animator.ResetTrigger("OnSkill");
+        if (_co != null)
+        {
+            CoroutineRunner.Instance.StopCoroutine(_co);
+            _co = null;
+        }
+        if (_effectHandle != null)
+        {
+            Managers.Pool.GetBack(_effectHandle);
+            _effectHandle = null;
+        }
     }
     protected override sealed void UpdateAction()
     {
@@ -103,7 +109,7 @@ public class PlayerMeleeSkillState: PlayerState
     private IEnumerator ActivateAnimationEvents()
     {
         _animator.SetInteger("SkillNO", _skillSO.SkillNO);
-        _animator.SetBool("OnSkill", true);
+        _animator.SetTrigger("OnSkill");
         EventSequence eventSequence = base._skillSO.EventSequence; //데이터를 가져온다. 
 
 
@@ -129,6 +135,7 @@ public class PlayerMeleeSkillState: PlayerState
         // 이벤트 정보 가져온다. . 
       
 
+        _animator.ResetTrigger("OnSkill");
         var events = eventSequence.eventClips[_nowAnim].events;
         List<bool> isPrevEventOns = Enumerable.Repeat(false, events.Count).ToList(); //세팅 (애니메이션 이벤트 플래그 -> false
         _nowHitAreaMarker = eventSequence.eventClips[_nowAnim].hitArea;
@@ -205,6 +212,7 @@ public class PlayerMeleeSkillState: PlayerState
 
     public void FireEvents(eAnimEvent eventName, bool isOn, AnimEventDesc eventDesc = default)
     {
+        if (isOn && Managers.UI.BlocksAttackInput) return;
         // Debug.Log(eventName);
         switch (eventName)
         {

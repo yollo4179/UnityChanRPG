@@ -26,6 +26,7 @@ public class ChainLightningProj : PlayerProjectile
 
     int level = 1; 
     List<GameObject> spawnedLineRenderers=new List<GameObject>();
+    readonly List<Poolable> _impactEffects = new List<Poolable>();
     List<EntityId> EnemiesInChain = new List<EntityId>();
     GameObject currentClosestEnemy; 
     bool shooting;
@@ -203,7 +204,8 @@ public class ChainLightningProj : PlayerProjectile
             {
                 
                 /*부모를 추가하고*/
-                var sortedList = closestEnemy.GetComponent<EnemyDetector>().GetClosestEnemySortedList();
+                EnemyDetector detector = closestEnemy != null ? closestEnemy.GetComponent<EnemyDetector>() : null;
+                var sortedList = detector != null ? detector.GetClosestEnemySortedList() : null;
                 if (null==sortedList)
                 {
                     StopShooting();
@@ -219,7 +221,7 @@ public class ChainLightningProj : PlayerProjectile
                     GameObject target = null;
                     for (int i = 0; i<sortedList.Count; ++i)
                     {
-                        if (sortedList[i] ==closestEnemy) continue;
+                        if (sortedList[i] == null || sortedList[i] == closestEnemy) continue;
 
                         target =sortedList[i];
 
@@ -253,7 +255,8 @@ public class ChainLightningProj : PlayerProjectile
 
         StartCoroutine(UpdateLineRenderer(lineR.gameObject, startPos,endPos, bFromPlayer));
         /*Effect*/
-        Poolable impactVFX = Managers.Pool.LendPoolableTo(impacPreFabPoolName, null);
+        Poolable impactVFX = Managers.Pool.LendPoolableTo(impacPreFabPoolName, transform);
+        _impactEffects.Add(impactVFX);
         impactVFX.gameObject.transform.position=endPos.position;
         impactVFX.gameObject.transform.rotation =CameraUtil.GetCameraRotation(endPos.position);
         impactVFX.GetComponent<Effect>().ParticleOn();
@@ -318,7 +321,7 @@ public class ChainLightningProj : PlayerProjectile
     IEnumerator UpdateLineRenderer(GameObject lineR, Transform startPos, Transform endPos, bool bFromPlayer = false)
     {
         var pool = lineR.GetComponent<Poolable>();
-        while (shooting && shot && pool._nowUsing)
+        while (shooting && shot && pool._nowUsing && startPos != null && endPos != null)
         {
             lineR.GetComponent<LineRendererController>().SetPosition(startPos, endPos);
             yield return null; // 다음 프레임
@@ -329,30 +332,47 @@ public class ChainLightningProj : PlayerProjectile
     }
     public void StopShooting()
     {
+        ClearChain();
+        Poolable pool = GetComponent<Poolable>();
+        if (pool != null && pool._nowUsing) Managers.Pool.GetBack(pool);
+    }
+
+    private void OnDisable()
+    {
+        ClearChain();
+    }
+
+    private void ClearChain()
+    {
+        // Stop pending links before returning visuals that another cast can reuse.
         ++_chainGen;
-        foreach ( var el  in  spawnedLineRenderers)
+        StopAllCoroutines();
+        shooting = false;
+        shot = false;
+        _co = null;
+        foreach (GameObject line in spawnedLineRenderers)
         {
-            el.GetComponent<LineRendererController>().SetPosition(Vector3.zero, Vector3.zero);
-            Managers.Pool.GetBack( el.GetComponent<Poolable>() );
+            if (line == null) continue;
+            line.GetComponent<LineRendererController>().SetPosition(Vector3.zero, Vector3.zero);
+            LightningBoltScript bolt = line.GetComponentInChildren<LightningBoltScript>(true);
+            if (bolt != null) { bolt.StartObject = null; bolt.EndObject = null; }
+            Poolable pool = line.GetComponent<Poolable>();
+            if (pool != null && pool._nowUsing) Managers.Pool.GetBack(pool);
         }
         spawnedLineRenderers.Clear();
-
+        foreach (Poolable impact in _impactEffects)
+        {
+            // An impact may already have finished and returned to its own pool.
+            if (impact == null || !impact._nowUsing || impact.transform.parent != transform) continue;
+            foreach (ParticleSystem particle in impact.GetComponentsInChildren<ParticleSystem>(true))
+                particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            Managers.Pool.GetBack(impact);
+        }
+        _impactEffects.Clear();
         level = 1;
-
         EnemiesInChain.Clear();
         _visited.Clear();
         _dicSE.Clear();
-
-        shooting =false;
-        shot =false;
-        _co =null;
-
-        var pool = GetComponent<Poolable>();
-        if(null != pool)
-        {
-            if (true==pool._nowUsing )
-            Managers.Pool.GetBack(pool);
-        }
     }
     public Dictionary<EntityId, EntityId> _dicSE = new Dictionary<EntityId, EntityId>();
 

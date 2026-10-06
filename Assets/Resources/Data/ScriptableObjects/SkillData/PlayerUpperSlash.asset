@@ -40,7 +40,7 @@ MonoBehaviour:
           localRotation: {x: 0, y: 270, z: 0}
           localScale: {x: 1, y: 1, z: 1}
           isLoop: 0
-          delayEffectActive: 1
+          delayEffectActive: 0
           isOnWeapon: 1
           hitNum: 0
         poolingProjectileKey: 

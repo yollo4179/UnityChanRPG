@@ -9,15 +9,21 @@ public class PlayerAnimatorCom : AnimatorCom
 
     private bool _lockY = false;
     private bool _lockRotationY = false;
+    private PlayerControllerCom _controller;
     protected override void Awake()
     {
         base.Awake();
+        // Keep root-motion extraction enabled. Changing it during combat resets
+        // the Animator and interrupts pose blending; OnAnimatorMove gates movement.
+        _Animator.applyRootMotion = true;
+        _controller = GetComponentInParent<PlayerControllerCom>();
     }
     public void OnMovement(float _Horizontal, float _Vertical)
     {
         _Animator.SetFloat("Horizontal", _Horizontal);
         _Animator.SetFloat("Vertical", _Vertical);
-        _Animator.SetFloat("Speed", new Vector2(_Horizontal, _Vertical).sqrMagnitude);
+        float speed = Mathf.Clamp01(new Vector2(_Horizontal, _Vertical).sqrMagnitude);
+        _Animator.SetFloat("Speed", speed, 0.2f, Time.deltaTime);
 
 
 
@@ -25,17 +31,12 @@ public class PlayerAnimatorCom : AnimatorCom
     //Root모션 적용중일때만 동작
     public void OnAnimatorMove()
     {
+        if (Managers.UI.BlocksGameplayInput) return;
+        // Only combat states use root motion; locomotion is moved by input.
+        if (_controller == null || !_controller.UsesAnimationRootMotion) return;
         Vector3 deltaPos = _Animator.deltaPosition;
-        if (deltaPos != Vector3.zero)
-        {
-            int a = 0;
-        }
         if (_lockY)
             deltaPos.y =0;
-        else
-        {
-            Debug.Log($"<color =#ffff00>RootY{deltaPos.y}</color>");
-        }
         MoveRootTo(deltaPos);
 
         /*루트모션 회전 제어*/
@@ -58,7 +59,10 @@ public class PlayerAnimatorCom : AnimatorCom
     }
     public void MoveRootTo(Vector3 dir)
     {
-        transform.position += dir;
+        // Vertical motion belongs to movement gravity/jump, not walk animation bobbing.
+        dir.y = 0f;
+        PlayerMovementCom movement = GetComponent<PlayerMovementCom>();
+        if (movement != null) movement.MoveWithCollision(dir);
     }
 
     public void OnJump()

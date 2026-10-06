@@ -18,6 +18,14 @@ public class PlayerRangedSkillState : PlayerState
     
 
     Coroutine _co = null;
+    private readonly List<ChainLightningProj> _activeChains = new List<ChainLightningProj>();
+
+    private void StopActiveChains()
+    {
+        foreach (ChainLightningProj chain in _activeChains)
+            if (chain != null && chain.gameObject.activeSelf) chain.StopShooting();
+        _activeChains.Clear();
+    }
    
 
     public override void Initialize()
@@ -48,7 +56,6 @@ public class PlayerRangedSkillState : PlayerState
 
         _animDone =false;
 
-        _animator.applyRootMotion =true;
         m_PlayerMovementCom.resetMovementVector();
         /*공격 바로 진입*/
         if (_animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.9f)
@@ -68,10 +75,18 @@ public class PlayerRangedSkillState : PlayerState
     }
     public override sealed void Exit()
     {
-        CoroutineRunner.Instance.StopCoroutine(ActivateAnimationEvents());
-
-
-        m_PlayerAnimatorCom._Animator.applyRootMotion =false;
+        if (_animator != null) _animator.ResetTrigger("OnSkill");
+        StopActiveChains();
+        if (_co != null)
+        {
+            CoroutineRunner.Instance.StopCoroutine(_co);
+            _co = null;
+        }
+        if (_effectHandle != null)
+        {
+            Managers.Pool.GetBack(_effectHandle);
+            _effectHandle = null;
+        }
     }
     protected override sealed void UpdateAction()
     {
@@ -117,7 +132,7 @@ public class PlayerRangedSkillState : PlayerState
     private IEnumerator ActivateAnimationEvents()
     {
         _animator.SetInteger("SkillNO", _skillSO.SkillNO);
-        _animator.SetBool("OnSkill", true);
+        _animator.SetTrigger("OnSkill");
         EventSequence eventSequence = base._skillSO.EventSequence; //데이터를 가져온다. 
 
 
@@ -144,6 +159,7 @@ public class PlayerRangedSkillState : PlayerState
         // 이벤트 정보 가져온다. . 
 
 
+        _animator.ResetTrigger("OnSkill");
         var events = eventSequence.eventClips[_nowAnim].events;
         List<bool> isPrevEventOns = Enumerable.Repeat(false, events.Count).ToList(); //세팅 (애니메이션 이벤트 플래그 -> false
         _nowHitAreaMarker = eventSequence.eventClips[_nowAnim].hitArea;
@@ -223,6 +239,7 @@ public class PlayerRangedSkillState : PlayerState
 
     public void FireEvents(eAnimEvent eventName, bool isOn, AnimEventDesc eventDesc = default)
     {
+        if (isOn && Managers.UI.BlocksAttackInput) return;
         // Debug.Log(eventName);
         switch (eventName)
         {
@@ -235,6 +252,7 @@ public class PlayerRangedSkillState : PlayerState
                             Poolable poolable = Managers.Pool.LendPoolableTo(eventDesc.poolingProjectileKey,null);//자식 필요하면  옵션으로 분기
                             PlayerProjectile projectile = poolable.GetComponent<PlayerProjectile>(); //플레이어 정보를 가져온다. ( 컨트롤러로부터)
                             projectile.SetSkillSO(_skillSO);
+                            if (projectile is ChainLightningProj chain) _activeChains.Add(chain);
                             projectile.Init(m_PlayerController);
                             
                         }
@@ -243,6 +261,7 @@ public class PlayerRangedSkillState : PlayerState
                         
                     }
 
+                    if (!isOn) StopActiveChains();
                     break;
             }
             case eAnimEvent.COLLIDER:

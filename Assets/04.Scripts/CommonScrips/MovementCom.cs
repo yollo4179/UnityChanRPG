@@ -35,7 +35,6 @@ public class MovementCom : MonoBehaviour
     protected float m_fJumpForce = 6f;
     public void UpdateYSpeedToJumpForce() => m_YSpeed = m_fJumpForce;
     protected bool m_isSprinting = false;
-    protected float m_fSprintSpeed = 15f;
 
 
     //private bool m_MoveHorize = false;
