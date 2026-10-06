@@ -1,4 +1,4 @@
-EventName,SpeakerName,NodeID,IsBranch,Animation,Script,Result,DialogueEffect,EffectAmount
+﻿EventName,SpeakerName,NodeID,IsBranch,Animation,Script,Result,DialogueEffect,EffectAmount
 마을 이장에게 말걸기,렌,0,FALSE,,이봐. 자네' 우리 마을에서 못보던 얼굴이군.새로운 모험가인가?,,,
 ,코하쿠(Player),1,FALSE,,네' 그렇습니다.,,,
 ,렌,2,FALSE,,우리 마을에 온것을 환영하네.& 흠흠.. 일단 옷이 허름한 것 같으니 옷부터 챙겨 입어야 겠군.,,,

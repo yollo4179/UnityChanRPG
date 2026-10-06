@@ -8,6 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1474348498223736775, guid: 0308c53485b00db4b9021a60fdcc77ea, type: 3}
+      propertyPath: m_Controller
+      value:
+      objectReference: {fileID: 9100000, guid: 694b243c6edc4ff082faf04ec38668e8, type: 2}
+    - target: {fileID: 1474348498223736775, guid: 0308c53485b00db4b9021a60fdcc77ea, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1185087072181487777, guid: 0308c53485b00db4b9021a60fdcc77ea, type: 3}
       propertyPath: m_LocalRotation.y
       value: 0.02307049

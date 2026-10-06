@@ -19,6 +19,7 @@ public class Task_LearnSkill :TaskEvaluator
     public void Execute(Event_UseSkillPoint evt) 
     {
         if (null ==evt) return;
+        if (evt._skillID != _targetID) return;
 
 
         if (_subTaskRunTimeProcess._runTimeProcess.TaskState != eQuestTaskState.ACCEPTED) return;

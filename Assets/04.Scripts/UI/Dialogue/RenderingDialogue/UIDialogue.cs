@@ -110,11 +110,11 @@ public class UIDialogue : UI_Base
     float m_fTypingSpeed = 0.1f;
 
    UI_Popup _handle;
+   private UnityAction _acceptAction;
 
     public void AddAcceptEvent(UnityAction action) //퀘스트 실행 람다 함수 전달 
     {
-        
-        m_NowSpeaker.Buttons["ACCEPT"].Item2.onClick.AddListener(action);
+        _acceptAction = action;
     }
     private void Awake()
     {
@@ -137,9 +137,7 @@ public class UIDialogue : UI_Base
                 case "FINISH":
                     {
                         ButtonSetGO.Button.onClick.AddListener(() => {
-                            ClearButtons();
-                            //this.gameObject.SetActive(false);
-                            Managers.UI.ClosePopupUI(_handle);
+                            OnClose();
                            
                         });
                         break;
@@ -155,23 +153,32 @@ public class UIDialogue : UI_Base
         get => m_Dialogues;
     }
     /* 퀘스트 혹은 외부 이벤트를 통해서 외부에서 키를 부여해 줍니다.*/
-    public void SetDialogues(string _DialogueKey)
+    public bool SetDialogues(string _DialogueKey)
     {
-        Managers.UI.ShowPopupUI<UI_Popup>("DialogueUI_Canvas_Prefab"); /*UI 활성화*/
+        _acceptAction = null;
         /*처음은 무조건 0번째 노드부터*/
         m_NowNode.NowNodeID=0;
         m_isFirstStart =true;
         m_DialogueKey =_DialogueKey;
         IsDialogueEnd = false; 
         Managers.Dialogue.GetDialoguesByName(m_DialogueKey, out m_Dialogues);
+        if (m_Dialogues == null || m_Dialogues.GetDialogueByNodeID(0) == null)
+        {
+            Debug.LogError($"Dialogue key has no starting node: {m_DialogueKey}");
+            OnClose();
+            return false;
+        }
         StartDialogue();
+        return true;
     } 
     private LEAFNODE_TYPE SetNextDialogue()
     {
         //여기서 세팅해놓고 
-        if(null ==m_Dialogues)
+        if (m_NowNode.NowDialogue == null ||
+            m_NowNode.NowDialogue.NextBranchNodeID.Count == 0)
         {
-            Debug.Log($"<color=#ff0000> 다이얼로그 목록이 비어 있습니다.</color>");
+            OnClose();
+            return LEAFNODE_TYPE.LEAF_DIALOGUE_END;
         }
 
         m_NowNode.NowNodeID                  = m_NowNode.NowDialogue.NextBranchNodeID[0];
@@ -201,7 +208,6 @@ public class UIDialogue : UI_Base
         {
 
             string key=ResponseTypeKeys[i];
-            if ("ACCEPT" !=key)
             m_NowSpeaker.Buttons[key].Item2.onClick.RemoveAllListeners();
             
             m_NowSpeaker.Buttons[key].Item2.gameObject.SetActive(true);
@@ -211,7 +217,11 @@ public class UIDialogue : UI_Base
 
             m_NowSpeaker.Buttons[key].Item2.onClick.AddListener(() => {
                 if ("ACCEPT" ==key)
-                    m_NowSpeaker.Buttons[key].Item2.onClick.RemoveAllListeners();
+                {
+                    var accept = _acceptAction;
+                    _acceptAction = null;
+                    accept?.Invoke();
+                }
 
                 /*다음에 실행될 노드를 세팅한다.*/
                 /*현재 노드로 교체후 코루틴 수행한다.*/
@@ -300,33 +310,9 @@ public class UIDialogue : UI_Base
             StartCoroutine("TypingEffect");
         }
         else
-        { 
-                /*CASE 3*/
-            if(LEAFNODE_TYPE.LEAF_DIALOGUE_END != SetNextDialogue())
-            StartCoroutine("TypingEffect");
-                /*NextButton 활성화*/
-            m_NowSpeaker.Buttons["NEXT"].Item2.gameObject.SetActive(true);
-
-
-           switch(isLeafNode())
-            {
-                case LEAFNODE_TYPE.LEAF_ONLY_ACCEPT:
-                    foreach (var ButtonPair in m_NowSpeaker.Buttons) { ButtonPair.Value.Item2.gameObject.SetActive(false); }
-                    m_NowSpeaker.Buttons["ACCEPT"].Item2.gameObject.SetActive(true);
-                    break;
-                case LEAFNODE_TYPE.LEAF_DIALOGUE_END:
-                    foreach (var ButtonPair in m_NowSpeaker.Buttons) { ButtonPair.Value.Item2.gameObject.SetActive(false); }
-                    m_NowSpeaker.Buttons["FINISH"].Item2.gameObject.SetActive(true);
-                    break;
-                case LEAFNODE_TYPE.NON_LEAF:
-                    break;
-                    //foreach (var ButtonPair in m_NowSpeaker.Buttons) { ButtonPair.Value.Item2.gameObject.SetActive(false); }
-                    //m_NowSpeaker.Buttons["FINISH"].Item2.gameObject.SetActive(true);
-                    //break;
-                   
-            }
-                
-          
+        {
+            if (SetNextDialogue() == LEAFNODE_TYPE.LEAF_DIALOGUE_END) return;
+            MoveOnToNextContext();
         }
     }
     private IEnumerator TypingEffect()
@@ -388,6 +374,9 @@ public class UIDialogue : UI_Base
 
     public void OnClose()
     {
+        _acceptAction = null;
+        StopCoroutine("TypingEffect");
+        ClearButtons();
         Managers.UI.ClosePopupUI(_handle);
     }
 

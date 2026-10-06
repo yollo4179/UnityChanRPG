@@ -5,7 +5,6 @@ public class Task_EquipItem : TaskEvaluator
     public Task_EquipItem(int targetID, QuestData questData, QuestRuntimeProcess questRunTimeProcess, SubTaskRuntimeProcess subTaskRuntimeProcess)
     : base(targetID, questData, questRunTimeProcess, subTaskRuntimeProcess)
     {
-        Managers.Event.Subscribe<Event_EquipItem>(Execute);
     }
     public override void ReadySubscribe()
     {

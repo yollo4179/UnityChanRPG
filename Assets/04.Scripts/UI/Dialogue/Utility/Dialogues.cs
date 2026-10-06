@@ -20,11 +20,11 @@ public class Dialogues
     public List<Dialogue> DialogueList { get => m_DialogueList; }
     public Dialogue GetDialogueByNodeID(int NodeID) 
     {
-        if(0>NodeID  ||NodeID >= m_DialogueList.Count)
+        if (!NodeIDToIndex.TryGetValue(NodeID, out int index))
         {
             return null;
-        }     
-        return m_DialogueList[ NodeIDToIndex[NodeID] ]; 
+        }
+        return m_DialogueList[index];
     } 
     public Dictionary<int, int> NodeIDToIndex;
     public int GetNowDicSize()

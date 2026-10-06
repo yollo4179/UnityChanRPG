@@ -20,6 +20,7 @@ public class Task_ConsumeItem : TaskEvaluator
     {
         //사실 assert가 맞다. 
         if (evt == null) return;
+        if (evt._itemInfo == null || evt._itemInfo.ID != _targetID) return;
         if (_subTaskRunTimeProcess._runTimeProcess.TaskState != eQuestTaskState.ACCEPTED) return;
         CheckTaskCompletedAndAcceptNextAfterIncreaseOne();
         CheckAndCallCompleteEvent(); 

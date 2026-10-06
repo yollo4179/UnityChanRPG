@@ -55,6 +55,7 @@ public class QuestData : ScriptableObject
             Managers.Inventory.TryAddItem(type, Reward.ItemID,Reward.ItemAmount);
         }
         Managers.Player.AddMoney(gold);
+        if (exp > 0) Managers.Player.AddEXP(exp);
 
 
 

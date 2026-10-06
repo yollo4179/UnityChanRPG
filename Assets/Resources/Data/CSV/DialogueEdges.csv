@@ -1,4 +1,4 @@
-EventName,FromNodeID,ToNodeID,ButtonLabel,Type
+﻿EventName,FromNodeID,ToNodeID,ButtonLabel,Type
 마을 이장에게 말걸기,0,1,NEXT,
 ,1,2,NEXT,
 ,2,3,수락한다.,ACCEPT

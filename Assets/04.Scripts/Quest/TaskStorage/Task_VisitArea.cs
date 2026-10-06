@@ -8,7 +8,6 @@ public class Task_VisitArea : TaskEvaluator
     {
         //AREAid == targetID
 
-        Managers.Event.Subscribe<Event_EnterArea>(Execute);
     }
     public override void ReadySubscribe()
     {

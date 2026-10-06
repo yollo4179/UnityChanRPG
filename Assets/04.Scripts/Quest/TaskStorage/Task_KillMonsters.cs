@@ -6,7 +6,6 @@ public class Task_KillMonsters : TaskEvaluator
     public Task_KillMonsters(int targetID, QuestData questData, QuestRuntimeProcess questRunTimeProcess, SubTaskRuntimeProcess subTaskRuntimeProcess)
     : base(targetID, questData,questRunTimeProcess, subTaskRuntimeProcess)
     {
-        Managers.Event.Subscribe<Event_KillTarget>(Execute);
     }
 
     public override void ReadySubscribe()

@@ -132,27 +132,24 @@ public class QuestManager
     }
     public void UpdateActivatedQuests(Event_QuestCompleted evt)
     {
-        foreach (var questData in _dicCurrentQuest)
-        {
-            if (true ==questData.Value.useAutoAcception)
-            {
-                ReadyQuest(questData.Value);
-                ActivateQuest(questData.Value);
-            }
-        }
+        UpdateReadyQuests();
     }
     public void UpdateReadyQuests(Event_QuestCompleted evt)
     {
-        foreach(var questData in _dicCurrentQuest)
-        {
-            ReadyQuest(questData.Value);
-        }
+        UpdateReadyQuests();
+    }
+    public void UpdateReadyQuests(Event_LevelUP evt)
+    {
+        UpdateReadyQuests();
     }
     public void UpdateReadyQuests()
     {
         foreach (var questData in _dicCurrentQuest)
         {
             ReadyQuest(questData.Value);
+            if (questData.Value.useAutoAcception &&
+                QuestState(questData.Value) == QUEST_STATE.QUEST_READY)
+                ActivateQuest(questData.Value);
         }
     }
     public List<QuestRuntimeProcess> GetReadyQuests()
@@ -178,7 +175,10 @@ public class QuestManager
         //퀘스트 발행은 Ready상태일때 처음 발행할 수 있다 .
         if (_questRunTimeProcesses[questData.QuestCODE]._runtimeProcess.State !=QUEST_STATE.QUEST_READY) return;
 
-        MakePhaseSubTasks(questData,QUEST_STATE.QUEST_ACCEPTED);
+        _questRunTimeProcesses[questData.QuestCODE]._runtimeProcess.State = QUEST_STATE.QUEST_ACCEPTED;
+        if (!_taskRuntimeProcesses.ContainsKey(questData.QuestCODE))
+            CreateTaskProcesses(questData);
+        ReconcileTaskStates(questData);
 
         Event_QuestAtivated evt = new Event_QuestAtivated(questData.QuestCODE);
         Managers.Event.Publish<Event_QuestAtivated>(evt);
@@ -193,10 +193,21 @@ public class QuestManager
 
 
 
+        CreateTaskProcesses(questData);
+        if (qeuestState == QUEST_STATE.QUEST_ACCEPTED)
+            ReconcileTaskStates(questData);
+    }
+
+    private void CreateTaskProcesses(QuestData questData, IEnumerable<SubTaskProcessDTO> savedTasks = null)
+    {
         var map = new Dictionary<string, SubTaskRuntimeProcess>();
+        var saved = savedTasks?.GroupBy(task => task.SubTaskCODE)
+            .ToDictionary(group => group.Key, group => group.First());
         foreach (var subTask in questData.tasks)
         {
-            var subTaskProcess = new SubTaskProcessDTO
+            SubTaskProcessDTO subTaskProcess;
+            if (saved == null || !saved.TryGetValue(subTask.SubTaskCODE, out subTaskProcess))
+                subTaskProcess = new SubTaskProcessDTO
             {
                 QuestCODE     = questData.QuestCODE,
                 SubTaskCODE   = subTask.SubTaskCODE,
@@ -215,10 +226,52 @@ public class QuestManager
 
             //진행도 애트리뷰트, 이벤트 기반 평가자 주입
         }
-        if(QUEST_STATE.QUEST_ACCEPTED ==qeuestState)
-        map[questData.tasks[0].SubTaskCODE]._runTimeProcess.TaskState = eQuestTaskState.ACCEPTED;
-
         _taskRuntimeProcesses[questData.QuestCODE] = map;
+    }
+
+    private void ReconcileTaskStates(QuestData questData)
+    {
+        var questState = QuestState(questData);
+        var map = _taskRuntimeProcesses[questData.QuestCODE];
+        bool hasActiveTask = false;
+        foreach (var task in questData.tasks)
+        {
+            var runtime = map[task.SubTaskCODE];
+            var process = runtime._runTimeProcess;
+            if (questState == QUEST_STATE.QUEST_COMPLETED ||
+                (questState == QUEST_STATE.QUEST_ACCEPTED && process.CurrentAmount >= task.GoalAmount))
+            {
+                process.TaskState = eQuestTaskState.COMPLETED;
+                process.CurrentAmount = Math.Max(process.CurrentAmount, task.GoalAmount);
+            }
+            if (questState == QUEST_STATE.QUEST_ACCEPTED && !hasActiveTask &&
+                process.TaskState != eQuestTaskState.COMPLETED)
+            {
+                process.TaskState = eQuestTaskState.ACCEPTED;
+                runtime._taskEvaluator.ReadySubscribe();
+                hasActiveTask = true;
+            }
+            else if (questState != QUEST_STATE.QUEST_COMPLETED &&
+                     process.TaskState != eQuestTaskState.COMPLETED)
+                process.TaskState = eQuestTaskState.NOT_STARTED;
+        }
+        if (questState == QUEST_STATE.QUEST_ACCEPTED && !hasActiveTask)
+            Debug.LogWarning($"Quest {questData.QuestCODE} has no unfinished task; completion will be checked on the next task event.");
+    }
+
+    public void ActivateNextTask(string questCode, string taskCode)
+    {
+        var tasks = _dicCurrentQuest[questCode].tasks;
+        int index = tasks.FindIndex(task => task.SubTaskCODE == taskCode);
+        for (int i = index + 1; i < tasks.Count; i++)
+        {
+            var runtime = _taskRuntimeProcesses[questCode][tasks[i].SubTaskCODE];
+            if (runtime._runTimeProcess.TaskState == eQuestTaskState.COMPLETED)
+                continue;
+            runtime._runTimeProcess.TaskState = eQuestTaskState.ACCEPTED;
+            runtime._taskEvaluator.ReadySubscribe();
+            return;
+        }
     }
 
     public SubTaskRuntimeProcess GetTaskRunTimeProcess(string questCode, string taskCode)
@@ -239,12 +292,18 @@ public class QuestManager
     }
     public void LoadQuests()
     {
+        if (!File.Exists(_pathQuest)) return;
         var json = File.ReadAllText(_pathQuest);
         var list = JsonConvert.DeserializeObject<List<QuestProcessDTO>>(json);
         if (null==list) return;
 
         foreach (var questDTO in list)
         {
+            if (questDTO == null || !_dicCurrentQuest.ContainsKey(questDTO.QuestCODE))
+            {
+                Debug.LogWarning($"Unknown quest in save: {questDTO?.QuestCODE}");
+                continue;
+            }
             QuestRuntimeProcess questRuntimeProcess = new QuestRuntimeProcess(questDTO);
             _questRunTimeProcesses[questRuntimeProcess._runtimeProcess.QuestCODE]= questRuntimeProcess;
         }
@@ -265,44 +324,15 @@ public class QuestManager
     }
     public void LoadAndJoinTasks()
     {
-        var json = File.ReadAllText(_pathTask);
-        var list = JsonConvert.DeserializeObject<List<SubTaskProcessDTO>>(json);
+        List<SubTaskProcessDTO> list = null;
+        if (File.Exists(_pathTask))
+            list = JsonConvert.DeserializeObject<List<SubTaskProcessDTO>>(File.ReadAllText(_pathTask));
 
-        // 1) 퀘스트별로 그룹화
-        var byQuest = list?.GroupBy(x => x.QuestCODE);
-        if (byQuest==null) return; 
-
-        foreach (var group in byQuest)
+        foreach (var questPair in _questRunTimeProcesses)
         {
-            var questCODE = group.Key;
-            if (!_dicCurrentQuest.TryGetValue(questCODE, out var questData)) //이 퀘스트가 없다면?
-            {
-                Debug.LogWarning($"Unknown questId: {questCODE}");
-                continue;
-            }
-            // 2) SO 정의를 기준으로 런타임 다시 구성
-            var map = new Dictionary<string, SubTaskRuntimeProcess>();
-            foreach (var subTask in questData.tasks)
-            {
-                // 저장에 있으면 가져오고, 없으면 기본값 생성
-                var save = group.FirstOrDefault(x => x.SubTaskCODE == subTask.SubTaskCODE)
-                        ?? new SubTaskProcessDTO
-                        {
-                            QuestCODE     = questData.QuestCODE,
-                            SubTaskCODE   = subTask.SubTaskCODE,
-                            CurrentAmount = 0,
-                            TaskState     = eQuestTaskState.NOT_STARTED
-                        };
-                map[subTask.SubTaskCODE] = new SubTaskRuntimeProcess(save);
-                TaskEvaluator ev =EvaluatorSpawner.GetEvaluator(subTask.Type, subTask.TargetID,questData ,_questRunTimeProcesses[questData.QuestCODE], map[subTask.SubTaskCODE]);
-                map[subTask.SubTaskCODE].InjectEvaluator(ev);
-
-
-            }
-            //if(0==map[questData.tasks[0].SubTaskCODE]._runTimeProcess.CurrentAmount)
-
-            //map[questData.tasks[0].SubTaskCODE]._runTimeProcess.TaskState = eQuestTaskState.ACCEPTED;
-            _taskRuntimeProcesses[questCODE] = map;
+            var questData = _dicCurrentQuest[questPair.Key];
+            CreateTaskProcesses(questData, list?.Where(task => task.QuestCODE == questPair.Key));
+            ReconcileTaskStates(questData);
         }
     }
 
@@ -333,6 +363,7 @@ public class QuestManager
 
         UpdateReadyQuests();
         Managers.Event.Subscribe<Event_QuestCompleted>(UpdateReadyQuests);
+        Managers.Event.Subscribe<Event_LevelUP>(UpdateReadyQuests);
         //Managers.Event.Subscribe<Event_QuestCompleted>(UpdateActivatedQuests);
     
     }

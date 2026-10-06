@@ -38,7 +38,6 @@ public class Task_TalkToNPC : TaskEvaluator
         CheckTaskCompletedAndAcceptNextAfterIncreaseOne();
         CheckAndCallCompleteEvent();
 
-        Managers.Event.UnSubscribe<Event_TalkToNPC>(Execute);
     }
 
 

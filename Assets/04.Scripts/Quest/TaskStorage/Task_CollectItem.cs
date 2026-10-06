@@ -21,10 +21,12 @@ public class Task_CollectItem : TaskEvaluator
     {
         if (evt == null) return;
         if (_questRunTimeProcess._runtimeProcess.State == QUEST_STATE.QUEST_COMPLETED) return;
+        if (_subTaskRunTimeProcess._runTimeProcess.TaskState != eQuestTaskState.ACCEPTED) return;
 
 
         if (_targetID != evt.ItemID) return;
         int amount = Managers.Inventory.AmountItem(_targetID);
+        _subTaskRunTimeProcess._runTimeProcess.CurrentAmount = amount;
 
         
         //모아서 가져가기

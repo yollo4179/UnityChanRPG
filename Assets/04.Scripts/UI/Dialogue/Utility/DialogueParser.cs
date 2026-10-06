@@ -44,6 +44,13 @@ public class DialogueParser
         /*인접 리스트로 처리합니다. From Node -> Multiple [To node] and Value____*/
         Dictionary<string, Dictionary<int, List<Tuple<int, EdgeData>>>> EdgeDataDictionary = new Dictionary<string, Dictionary<int, List<Tuple<int, EdgeData> >>>();
         TextAsset EdgeAsset = Resources.Load<TextAsset>("Data/CSV/" + _EdgeFileName);
+        TextAsset NodeAsset = Resources.Load<TextAsset>("Data/CSV/" + _NodeFileName);
+        Dictionary<string, Dialogues> DailogueDictionary = new Dictionary<string, Dialogues>();
+        if (NodeAsset == null || EdgeAsset == null)
+        {
+            Debug.LogError("Dialogue CSV files not found.");
+            return DailogueDictionary;
+        }
         var Lines = EdgeAsset.text.Replace("\r\n", "\n").Replace("\r", "\n");
         var EdgeRows = Lines.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
@@ -86,13 +93,6 @@ public class DialogueParser
         Debug.Log($"<color=cyan> 엣지 정렬 완료{EdgeDataDictionary}</color>");
 
         /*노드 처리합니다*/
-        Dictionary<string, Dialogues> DailogueDictionary= new Dictionary<string, Dialogues>();
-        TextAsset NodeAsset =  Resources.Load<TextAsset>("Data/CSV/" + _NodeFileName);
-        if (NodeAsset == null || EdgeAsset == null)
-        {
-            Debug.LogError("<color=red>CSV files not found!</red>");
-            return DailogueDictionary;
-        }
         Lines = NodeAsset.text.Replace("\r\n", "\n").Replace("\r", "\n");
         string[] NodeRows = Lines.Split(new char[] { '\n' },StringSplitOptions.RemoveEmptyEntries);
         /*csv 첫 행은 설명 */

@@ -15,6 +15,18 @@ public class NPCScript_Quest : NPCScript
     public virtual void Awake()
     {
         Managers.Event.Subscribe<Event_TaskUpdated>(CheckTalkable);  
+        Managers.Event.Subscribe<Event_QuestAtivated>(CheckTalkable);
+    }
+    private void OnDestroy()
+    {
+        EventManager eventManager = Managers.EventIfExists;
+        if (eventManager == null) return;
+        eventManager.UnSubscribe<Event_TaskUpdated>(CheckTalkable);
+        eventManager.UnSubscribe<Event_QuestAtivated>(CheckTalkable);
+    }
+    private void CheckTalkable(Event_QuestAtivated evt)
+    {
+        CheckTalkable();
     }
     public void CheckTalkable(Event_TaskUpdated evt)
     {
@@ -112,24 +124,22 @@ public class NPCScript_Quest : NPCScript
                
                 UI_Popup popUp = Managers.UI.ShowPopupUI<UI_Popup>("DialogueUI_Canvas_Prefab");
                 UIDialogue uiDialogue = popUp.gameObject.GetComponentInChildren<UIDialogue>();
-                uiDialogue.SetDialogues(task.DialogKey);
-                SubTaskRuntimeProcess cachedprocess = Managers.Quest.GetTaskRunTimeProcess(data.QuestCODE, task.SubTaskCODE);
+                if (!uiDialogue.SetDialogues(task.DialogKey)) return;
                 uiDialogue.AddAcceptEvent(
                     () =>
                     {
-
-                        cachedprocess._taskEvaluator.ReadySubscribe();
                         Event_TalkToNPC evt = new Event_TalkToNPC(NPC_ID, data.QuestCODE, task.SubTaskCODE);
                         Managers.Event.Publish<Event_TalkToNPC>(evt);
 
                         _isTalkable =false;
-                        CloseQuestionMark();
+                        if (_questMarkHandler != null) CloseQuestionMark();
+                        CheckTalkable();
                     }
                 );// 성공 버튼 클릭 시 수행할 이벤트를 콜백으로 등록
                
 
 
-                break;
+                return;
 
             }
 
