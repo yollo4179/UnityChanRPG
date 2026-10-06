@@ -59,3 +59,13 @@ crashlytics-build.properties
 .DS_Store*
 Thumbs.db
 Desktop.ini
+
+# Local save backups
+/LocalBackups/
+
+# Local recovery scenes and review artifacts
+/Assets/_Recovery/
+/Assets/_Recovery.meta
+/troubleshooting/*
+!/troubleshooting/*.md
+/gameplay-regression-build.log
